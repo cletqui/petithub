@@ -2,7 +2,7 @@ name = "petithub"
 pages_build_output_dir = "./dist"
 
 [vars]
-MAX_ID = 808682850
+MAX_ID = "808682850"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
