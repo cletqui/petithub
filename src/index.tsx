@@ -51,38 +51,32 @@ const getStars = async (octokit: Octokit, owner: string, repo: string) => {
   });
 };
 
-const getData = async (
-  octokit: Octokit,
-  maxId: number
-): Promise<Repository> => {
-  let repository = null;
+const getData = async (octokit: Octokit, maxId: number) => {
   const maxIterations = 10; // max iterations
   for (let loop = 0; loop < maxIterations; loop++) {
     const since = Math.floor(Math.random() * maxId);
     const { data: repositories } = await getRepository(octokit, since);
-    repositories
-      .filter((repo: Repository) => !repo.fork) // remove the forked repositories
-      .some(async (repo: Repository) => {
-        const {
-          name,
-          owner: { login },
-        } = repo; // TODO remove the empty repositories
-        const { data: stars } = await getStars(octokit, login, name); // TODO deal with errors
-        if (stars.length === 0) {
-          repository = repo;
-          return true;
-        }
-        console.log(`${login}/${name}`);
-        return false;
-      });
-    if (repository) {
-      break;
+    for (const repo of repositories.filter((repo: Repository) => !repo.fork)) {
+      const {
+        name,
+        owner: { login },
+      } = repo; // TODO remove the empty repositories
+      const { data: stars } = await getStars(octokit, login, name); // TODO deal with errors
+      if (stars.length === 0) {
+        return repo;
+      }
+      console.log(`${login}/${name}`);
     }
   }
-  return repository;
+  return null;
 };
 
-const Repository = async ({ octokit, maxId }) => {
+interface RepositoryComponent {
+  octokit: Octokit;
+  maxId: number;
+}
+
+const Repository = async ({ octokit, maxId }: RepositoryComponent) => {
   const repository = await getData(octokit, maxId);
   return <Container repository={repository} />;
 };
@@ -104,11 +98,6 @@ app.get("/json/:id", async (c) => {
   });
   const { data } = await getRepository(octokit, Number(id) - 1);
   return c.json(data[0]); // TODO check the status
-});
-
-app.get("/template", async (c) => {
-  // TODO
-  // 1296268
 });
 
 app.get("/", async (c) => {
