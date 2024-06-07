@@ -1,6 +1,8 @@
 import { jsxRenderer } from "hono/jsx-renderer";
+import { PropsWithChildren } from "hono/jsx";
+import { JSX } from "hono/jsx/jsx-runtime";
 
-interface Repository {
+export interface Repository {
   id: number;
   name: string;
   full_name: string;
@@ -9,11 +11,11 @@ interface Repository {
     html_url: string;
   };
   fork: boolean;
-  description: string;
+  description: string | null;
   html_url: string;
 }
 
-export const Loader = () => {
+export const Loader = (): JSX.Element => {
   return (
     <div class="lds-ripple">
       <div></div>
@@ -22,7 +24,22 @@ export const Loader = () => {
   );
 };
 
-export const Container = ({ repository }) => {
+const ErrorContainer = () => {
+  return (
+    <div class="container">
+      <p>{"No repository found"}</p>
+    </div>
+  );
+};
+
+export const Container = ({
+  repository,
+}: {
+  repository: Repository | null;
+}): JSX.Element => {
+  if (!repository) {
+    return <ErrorContainer />;
+  }
   const {
     id,
     name,
@@ -62,32 +79,42 @@ export const Container = ({ repository }) => {
 };
 
 export const renderer = jsxRenderer(
-  ({ children, title }) => {
+  ({ children, title }: PropsWithChildren<{ title?: string }>): JSX.Element => {
     return (
       <html>
         <head>
           <meta charset="UTF-8" />
-          <title>{`PetitHub ${title && `- ${title}`}`}</title>
-          <meta name="description" content={`PetitHub - ${title}`} />
+          <title>{title}</title>
+          <meta name="description" content={title} />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link href="/static/style.css" rel="stylesheet" />
         </head>
         <body>
-          <h1>{"PetitHub"}</h1>
+          <header class="header">
+            <h1>PetitHub</h1>
+          </header>
           <div class="container-wrapper">{children}</div>
-          <div class="footer">
+          <footer class="footer">
             <p>
-              <a class="author-link" href="https://github.com/cletqui/petithub">
-                {"PetitHub"}
-              </a>
-              {" - "}
               <a
                 class="author-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/cletqui/petithub"
+              >
+                PetitHub
+              </a>
+              -
+              <a
+                class="author-link"
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.buymeacoffee.com/cletqui"
               >
-                {"BuyMeACoffee"}
+                BuyMeACoffee
               </a>
             </p>
-          </div>
+          </footer>
         </body>
       </html>
     );

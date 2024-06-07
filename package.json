@@ -1,7 +1,7 @@
 {
   "name": "petithub",
-  "version": "0.3.2",
-  "private": true,
+  "version": "0.3.3",
+  "private": false,
   "description": "Petit Hub - Search for obscure GitHub repositories",
   "author": {
     "name": "cletqui"
