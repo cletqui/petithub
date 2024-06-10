@@ -78,8 +78,9 @@ const getBranches = async (
 const getData = async (
   octokit: Octokit,
   maxId: number
-): Promise<Repository | null> => {
+): Promise<Repository> => {
   const maxIterations = 10; // max iterations
+  const error = "Unknown error";
   for (let loop = 0; loop < maxIterations; loop++) {
     const since = Math.floor(Math.random() * maxId);
     const { data: repositories } = await getRepository(octokit, since);
@@ -99,7 +100,8 @@ const getData = async (
       console.log(`${login}/${name}`);
     }
   }
-  return null;
+  console.error(error);
+  throw new Error(error);
 };
 
 const Repository = async ({
@@ -110,13 +112,11 @@ const Repository = async ({
   maxId: number;
 }): Promise<HtmlEscapedString> => {
   const repository = await getData(octokit, maxId);
-  if (repository) {
-    const {
-      name,
-      owner: { login },
-    } = repository;
-    const title = `PetitHub - ${login}/${name}`;
-  }
+  /* const {
+    name,
+    owner: { login },
+  } = repository;
+  const title = `PetitHub - ${login}/${name}`; */
   return <Container repository={repository} />;
 };
 

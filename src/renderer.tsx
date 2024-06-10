@@ -35,11 +35,8 @@ const ErrorContainer = () => {
 export const Container = ({
   repository,
 }: {
-  repository: Repository | null;
+  repository: Repository;
 }): JSX.Element => {
-  if (!repository) {
-    return <ErrorContainer />;
-  }
   const {
     id,
     name,

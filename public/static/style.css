@@ -23,7 +23,7 @@ body {
 }
 .container {
   width: 80%;
-  max-width: 69lvw;
+  max-width: 69vmin;
   padding: 20px;
   background-color: var(--container-bg-color);
   border: 1px solid var(--container-border-color);
