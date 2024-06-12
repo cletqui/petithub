@@ -27,7 +27,7 @@ body {
   padding: 20px;
   background-color: var(--container-bg-color);
   border: 1px solid var(--container-border-color);
-  border-radius: .5em;
+  border-radius: 0.5em;
   box-shadow: 0 1px 3px rgba(27, 31, 35, 0.12),
     0 8px 24px rgba(27, 31, 35, 0.12);
 }
@@ -52,7 +52,6 @@ h3 {
   padding-bottom: 8px;
 }
 p {
-  font-size: 1rem;
   margin-top: 10px;
   color: var(--p-color);
 }
@@ -131,6 +130,34 @@ a:hover {
     --footer-color: #8b949e;
     --footer-border-color: #30363d;
   }
+}
+
+/* style.css */
+.icon {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  margin: 0 1rem;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.github-icon {
+  color: var(--a-color); /* GitHub's primary color */
+  transition: fill 0.3s;
+}
+
+.github-icon:hover {
+  fill: var(--h2-color); /* Change color on hover */
+}
+
+.buymeacoffee-icon {
+  fill: var(--repo-link-bg-color); /* Buy Me a Coffee's primary color */
+  transition: fill 0.3s;
+}
+
+.buymeacoffee-icon:hover {
+  fill: var(--repo-link-bg-hover-color); /* Change color on hover */
 }
 
 /* Loader */

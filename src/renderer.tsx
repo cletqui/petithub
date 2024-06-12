@@ -24,14 +24,6 @@ export const Loader = (): JSX.Element => {
   );
 };
 
-const ErrorContainer = () => {
-  return (
-    <div class="container">
-      <p>{"No repository found"}</p>
-    </div>
-  );
-};
-
 export const Container = ({
   repository,
 }: {
@@ -44,6 +36,11 @@ export const Container = ({
     owner: { login, html_url: owner_html_url },
     description,
     html_url,
+    // forks_count,
+    // stargazers_count,
+    // watchers_count,
+    // subscribers_count,
+    // size,
   } = repository;
   return (
     <div class="container">
@@ -73,7 +70,7 @@ export const Container = ({
       </p>
     </div>
   );
-};
+}; // TODO add more metadata (languages, tags, topics, stargazers, watchers, branches, commits, downloads)
 
 export const renderer = jsxRenderer(
   ({ children, title }: PropsWithChildren<{ title?: string }>): JSX.Element => {
@@ -99,16 +96,23 @@ export const renderer = jsxRenderer(
                 rel="noopener noreferrer"
                 href="https://github.com/cletqui/petithub"
               >
-                PetitHub
+                <img
+                  src="/static/github.svg"
+                  alt="GitHub"
+                  class="icon github-icon"
+                />
               </a>
-              -
               <a
                 class="author-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://www.buymeacoffee.com/cletqui"
               >
-                BuyMeACoffee
+                <img
+                  src="/static/buymeacoffee.svg"
+                  alt="BuyMeACoffee"
+                  class="icon buymeacoffee-icon"
+                />
               </a>
             </p>
           </footer>
