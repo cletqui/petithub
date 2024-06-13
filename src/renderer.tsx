@@ -79,9 +79,14 @@ export const renderer = jsxRenderer(
         <head>
           <meta charset="UTF-8" />
           <title>{title}</title>
-          <meta name="description" content={title} />
+          <meta
+            name="description"
+            content="Explore obscure GitHub repositories"
+          />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link href="/static/style.css" rel="stylesheet" />
+          <link rel="stylesheet" href="/static/style.css" />
+          <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+          <link rel="manifest" href="/static/manifest.webmanifest" />
         </head>
         <body>
           <header class="header">
@@ -91,7 +96,6 @@ export const renderer = jsxRenderer(
           <footer class="footer">
             <p>
               <a
-                class="author-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://github.com/cletqui/petithub"
@@ -103,7 +107,6 @@ export const renderer = jsxRenderer(
                 />
               </a>
               <a
-                class="author-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://www.buymeacoffee.com/cletqui"

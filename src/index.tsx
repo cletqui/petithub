@@ -76,7 +76,9 @@ const getData = async (
         if (stargazers_count === 0 && size > 0) {
           return repos;
         }
-        console.log(`${login}/${name}`);
+        console.log(
+          `${login}/${name} (stars: ${stargazers_count}, size: ${size})`
+        );
       }
     }
     throw new Error(`No repository found with ${maxIterations} iterations`);

@@ -96,7 +96,7 @@ a:hover {
     --body-color: #24292e;
     --container-bg-color: #ffffff;
     --container-border-color: #e1e4e8;
-    --h1-color: #24292e;
+    --h1-color: #24292f;
     --h2-color: #0366d6;
     --h3-color: #586069;
     --h3-border-color: #eaecef;
@@ -108,6 +108,10 @@ a:hover {
     --author-link-hover-color: #0366d6;
     --footer-color: #586069;
     --footer-border-color: #eaecef;
+    --svg-icon-color: invert(39%) sepia(5%) saturate(870%) hue-rotate(171deg)
+      brightness(94%) contrast(95%); /* #586069 */
+    --svg-icon-color-hover: invert(11%) sepia(25%) saturate(460%)
+      hue-rotate(172deg) brightness(92%) contrast(87%); /* #24292f */
   }
 }
 /* Dark Theme */
@@ -129,35 +133,28 @@ a:hover {
     --author-link-hover-color: #58a6ff;
     --footer-color: #8b949e;
     --footer-border-color: #30363d;
+    --svg-icon-color: invert(61%) sepia(6%) saturate(595%) hue-rotate(171deg)
+      brightness(95%) contrast(87%); /* #8b949e */
+    --svg-icon-color-hover: invert(81%) sepia(5%) saturate(357%)
+      hue-rotate(168deg) brightness(106%) contrast(86%); /* c9d1d9 */
   }
 }
 
-/* style.css */
+/* Footer icons */
 .icon {
   display: inline-block;
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   margin: 0 1rem;
   cursor: pointer;
+  filter: var(--svg-icon-color);
+  transition: filter 0.3s;
   transition: transform 0.3s;
 }
 
-.github-icon {
-  color: var(--a-color); /* GitHub's primary color */
-  transition: fill 0.3s;
-}
-
-.github-icon:hover {
-  fill: var(--h2-color); /* Change color on hover */
-}
-
-.buymeacoffee-icon {
-  fill: var(--repo-link-bg-color); /* Buy Me a Coffee's primary color */
-  transition: fill 0.3s;
-}
-
-.buymeacoffee-icon:hover {
-  fill: var(--repo-link-bg-hover-color); /* Change color on hover */
+.icon:hover {
+  filter: var(--svg-icon-color-hover);
+  transform: scale(1.1);
 }
 
 /* Loader */
