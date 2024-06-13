@@ -100,7 +100,7 @@ const Repository = async ({
   return <Container repository={repository} />;
 };
 
-app.get("/json", async (c: Context<{ Bindings: Bindings }>) => {
+app.get("/json", async (c: Context<{ Bindings: Bindings }>) => { // TODO implement Bearer Authentication
   const { GITHUB_TOKEN, MAX_ID } = c.env;
   const octokit = getOctokitInstance(GITHUB_TOKEN);
   try {
@@ -112,7 +112,7 @@ app.get("/json", async (c: Context<{ Bindings: Bindings }>) => {
   }
 }); // TODO require API token for /json*
 
-app.get("/json/:id", async (c: Context<{ Bindings: Bindings }>) => {
+app.get("/json/:id", async (c: Context<{ Bindings: Bindings }>) => { // TODO implement Bearer Authentication
   const { id } = c.req.param();
   const { GITHUB_TOKEN } = c.env;
   const octokit = getOctokitInstance(GITHUB_TOKEN);
