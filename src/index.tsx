@@ -4,6 +4,7 @@ import { prettyJSON } from "hono/pretty-json";
 import { Octokit } from "@octokit/core";
 import { OctokitResponse } from "@octokit/types";
 import { HtmlEscapedString } from "hono/utils/html";
+import { bearerAuth } from "hono/bearer-auth";
 
 import { renderer, Container, Loader, Repository } from "./renderer";
 
@@ -16,6 +17,20 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.use(renderer);
 app.use(prettyJSON());
+app.use(
+  "/api/*",
+  bearerAuth({
+    verifyToken: async (token: string, c: Context) => {
+      const octokit = getOctokitInstance(token);
+      try {
+        const { status } = await getRepos(octokit, "octocat", "Hello-World");
+        return status === 200;
+      } catch (error) {
+        return false;
+      }
+    },
+  })
+);
 
 const getOctokitInstance = (token: string): Octokit => {
   return new Octokit({
@@ -87,6 +102,69 @@ const getData = async (
   }
 };
 
+const getMaxId = async (octokit: Octokit, id: number) => {
+  // Initial search to find a boundary where repositories stop
+  let max = 10;
+  let inc = 100;
+  let prev = id;
+  let next = id;
+  let list = await getRepositories(octokit, id);
+  while (list.data.length > 0 && max > 0) {
+    prev = next;
+    next += inc;
+    list = await getRepositories(octokit, next);
+    max -= 1;
+    inc *= 10;
+    console.log(
+      `(${max}) MAX_ID: ${id}, PREV: ${prev}, NEXT: ${next}, INC: ${inc}, LENGTH: ${list.data.length}`
+    );
+  }
+  console.log(
+    `ID max is between ${prev} (where data.length = ${
+      (await getRepositories(octokit, prev)).data.length
+    }}) and ${next} (where data.length = ${
+      (await getRepositories(octokit, next)).data.length
+    })`
+  );
+  // Binary search to find the exact boundary
+  max = 20;
+  let middle = id;
+  while (next - prev > 100 && max > 0) {
+    middle = prev + Math.floor((next - prev) / 2);
+    list = await getRepositories(octokit, middle);
+
+    if (list.data.length > 0) {
+      prev = middle;
+    } else {
+      next = middle;
+    }
+    console.log(
+      `(${max}) PREV: ${prev}, MIDDLE: ${middle}, NEXT: ${next}, DELTA: ${
+        next - prev
+      }, LENGTH: ${list.data.length}, DECISION: ${
+        list.data.length > 0 ? "prev = middle" : "next = middle"
+      }`
+    );
+    max -= 1;
+  }
+  console.log(
+    `Loop stopped because: ${
+      list.data.length < 100
+        ? `data.length = ${list.data.length}`
+        : next - prev <= 100
+        ? `next - prev = ${next - prev}`
+        : `max = ${max}`
+    }`
+  );
+  // Get the last repository ID in the determined range
+  const last = await getRepositories(octokit, middle);
+  const res = last.data.length > 0 ? last.data[last.data.length - 1].id : prev;
+  console.log(
+    `MIDDLE: ${middle}, RES: ${res}, LENGTH: ${last.data.length}`
+  );
+  return res;
+};
+
 const Repository = async ({
   octokit,
   maxId,
@@ -100,7 +178,7 @@ const Repository = async ({
   return <Container repository={repository} />;
 };
 
-app.get("/json", async (c: Context<{ Bindings: Bindings }>) => { // TODO implement Bearer Authentication
+app.get("/api", async (c: Context<{ Bindings: Bindings }>) => {
   const { GITHUB_TOKEN, MAX_ID } = c.env;
   const octokit = getOctokitInstance(GITHUB_TOKEN);
   try {
@@ -110,9 +188,9 @@ app.get("/json", async (c: Context<{ Bindings: Bindings }>) => { // TODO impleme
     console.error("Error fetching repository data:", error);
     return c.json({ error: "Failed to fetch repository data" }, 500);
   }
-}); // TODO require API token for /json*
+});
 
-app.get("/json/:id", async (c: Context<{ Bindings: Bindings }>) => { // TODO implement Bearer Authentication
+app.get("/api/:id", async (c: Context<{ Bindings: Bindings }>) => {
   const { id } = c.req.param();
   const { GITHUB_TOKEN } = c.env;
   const octokit = getOctokitInstance(GITHUB_TOKEN);
@@ -122,6 +200,34 @@ app.get("/json/:id", async (c: Context<{ Bindings: Bindings }>) => { // TODO imp
   }
   return c.json(data[0]);
 }); // TODO check the status
+
+app.get("/id", async (c: Context<{ Bindings: Bindings }>) => {
+  const { GITHUB_TOKEN, MAX_ID } = c.env;
+  const octokit = getOctokitInstance(GITHUB_TOKEN);
+  if (MAX_ID) {
+    const id = await getMaxId(octokit, Number(MAX_ID));
+    const timestamp = new Date();
+    return c.json({ id, timestamp });
+  } else {
+    return c.text("No MAX_ID found", 404);
+  }
+});
+
+app.get("/template", async (c: Context<{ Bindings: Bindings }>) => {
+  const { GITHUB_TOKEN } = c.env;
+  const octokit = getOctokitInstance(GITHUB_TOKEN);
+  const { data: repository } = await getRepos(
+    octokit,
+    "octocat",
+    "Hello-World"
+  );
+  return c.render(
+    <Suspense fallback={<Loader />}>
+      <Container repository={repository} />
+    </Suspense>,
+    { title: "PetitHub - octocat/Hello-world" }
+  );
+});
 
 app.get("/", async (c: Context<{ Bindings: Bindings }>) => {
   const { GITHUB_TOKEN, MAX_ID } = c.env;

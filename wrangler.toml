@@ -3,7 +3,7 @@ pages_build_output_dir = "./dist"
 compatibility_date = "2022-11-30"
 
 [vars]
-MAX_ID = "808682850"
+MAX_ID = "815181172"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
