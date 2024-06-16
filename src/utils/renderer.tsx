@@ -1,6 +1,10 @@
 import { jsxRenderer } from "hono/jsx-renderer";
 import { PropsWithChildren } from "hono/jsx";
 import { JSX } from "hono/jsx/jsx-runtime";
+import { HtmlEscapedString } from "hono/utils/html";
+import { Octokit } from "@octokit/core";
+
+import { getData } from "./octokit";
 
 export interface Repository {
   id: number;
@@ -14,6 +18,19 @@ export interface Repository {
   description: string | null;
   html_url: string;
 }
+
+export const RepositoryContainer = async ({
+  octokit,
+  maxId,
+}: {
+  octokit: Octokit;
+  maxId: number;
+}): Promise<HtmlEscapedString> => {
+  const repository = await getData(octokit, maxId);
+  /* const { full_name } = repository;
+  const title = `PetitHub - ${full_name}`; */
+  return <Container repository={repository} />;
+};
 
 export const Loader = (): JSX.Element => {
   return (
@@ -85,8 +102,13 @@ export const renderer = jsxRenderer(
           />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="/static/style.css" />
-          <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+          <link
+            rel="icon"
+            href="/static/icons/favicon.svg"
+            type="image/svg+xml"
+          />
           <link rel="manifest" href="/static/manifest.webmanifest" />
+          <script src="/static/script.js" type="module"></script>
         </head>
         <body>
           <header class="header">
@@ -101,7 +123,7 @@ export const renderer = jsxRenderer(
                 href="https://github.com/cletqui/petithub"
               >
                 <img
-                  src="/static/github.svg"
+                  src="/static/icons/github.svg"
                   alt="GitHub"
                   class="icon github-icon"
                 />
@@ -112,7 +134,7 @@ export const renderer = jsxRenderer(
                 href="https://www.buymeacoffee.com/cletqui"
               >
                 <img
-                  src="/static/buymeacoffee.svg"
+                  src="/static/icons/buymeacoffee.svg"
                   alt="BuyMeACoffee"
                   class="icon buymeacoffee-icon"
                 />

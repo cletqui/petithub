@@ -11,4 +11,15 @@ export default defineConfig({
       entry: "src/index.tsx",
     }),
   ],
+  test: {
+    include: ["**/*.test.tsx"],
+    globals: true,
+    poolOptions: {
+      workers: {
+        wrangler: {
+          configPath: "./wrangler.toml",
+        },
+      },
+    },
+  },
 });

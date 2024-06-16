@@ -21,9 +21,9 @@ npm run deploy
 - [ ] Setup GitHub App (to avoid refreshing PAT every year)
 - [ ] Improve GUI (by adding additional info about the repo)
 - [x] Add icons in footer
-- [ ] Find `MAX_ID` dynamically and store in Cookies
+- [x] Find `MAX_ID` dynamically and store in Cookies
 - [x] Require GitHub API (Bearer Auth) for `/api/*` requests
 - [ ] Change the document title dynamically
 - [ ] Write `README.md`
 - [x] Display Template
-- [ ] Refactor code into smaller modules
+- [x] Refactor code into smaller modules
