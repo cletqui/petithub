@@ -5,7 +5,7 @@ const MOCK_ENV = {
 };
 
 describe("Testing API", () => {
-  test("GET /api without API key", async () => {
+  test("GET /api (no API key)", async () => {
     const res = await app.request("/api");
     expect(res.status).toBe(401);
     expect(await res.text()).toBe("Unauthorized");
@@ -35,3 +35,11 @@ describe("Testing root", () => {
   });
 });
 */
+
+describe("Testing default redirect", () => {
+  test("GET /test", async () => {
+    const res = await app.request("/test");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("/");
+  });
+});

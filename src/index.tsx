@@ -112,4 +112,8 @@ app.get("/", async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
   );
 });
 
+app.get("*", (c) => {
+  return c.redirect("/", 301);
+});
+
 export default app;
