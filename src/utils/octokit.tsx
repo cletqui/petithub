@@ -119,7 +119,7 @@ export const getMaxId = async (
     })`
   );
   // Binary search to find the exact boundary
-  max = 20;
+  max = 50;
   let middle = id;
   while (next - prev > 100 && max > 0) {
     middle = prev + Math.floor((next - prev) / 2);
