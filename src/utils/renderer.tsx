@@ -4,7 +4,7 @@ import { JSX } from "hono/jsx/jsx-runtime";
 import { HtmlEscapedString } from "hono/utils/html";
 import { Octokit } from "@octokit/core";
 
-import { getData } from "./octokit";
+import { getRandomRepository } from "./octokit";
 
 export interface Repository {
   id: number;
@@ -26,7 +26,7 @@ export const RepositoryContainer = async ({
   octokit: Octokit;
   maxId: number;
 }): Promise<HtmlEscapedString> => {
-  const repository = await getData(octokit, maxId);
+  const repository = await getRandomRepository(octokit, maxId);
   /* const { full_name } = repository;
   const title = `PetitHub - ${full_name}`; */
   return <Container repository={repository} />;

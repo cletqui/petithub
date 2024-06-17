@@ -32,17 +32,14 @@ export const verifyToken = async (
   }
 };
 
-export const getRepositories = async (
+const getRepositories = async (
   octokit: Octokit,
   since: number
 ): Promise<OctokitResponse<Repository[]>> => {
   try {
-    return await octokit.request("GET /repositories", {
-      since,
-    });
+    return await octokit.request("GET /repositories", { since });
   } catch (error: any) {
-    console.error("Error fetching repositories:", error);
-    throw new Error("Failed to fetch repositories");
+    throw new Error(`Error fetching repositories since ${since}: ${error}`);
   }
 };
 
@@ -54,11 +51,40 @@ export const getRepos = async (
   try {
     return await octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
-    console.error(`Error fetching repository for ${owner}/${repo}:`, error);
-    throw new Error(`Failed to fetch repository for ${owner}/${repo}`);
+    throw new Error(`Error fetching repository for ${owner}/${repo}: ${error}`);
   }
 };
-export const getData = async (
+
+export const getRepository = async (
+  octokit: Octokit,
+  id: number
+): Promise<Repository> => {
+  try {
+    const { data, status, url } = await getRepositories(
+      octokit,
+      Number(id) - 1
+    ); // (id - 1) because since starts from next id
+    if (status === 200) {
+      if (data.length === 0) {
+        throw new Error("Repository not found");
+      } else {
+        const repo = data[0];
+        const {
+          name,
+          owner: { login },
+        } = repo;
+        const { data: repository } = await getRepos(octokit, login, name);
+        return repository;
+      }
+    } else {
+      throw new Error(`${status} error at ${url}`);
+    }
+  } catch (error: any) {
+    throw new Error(`Error fetching repository for id=${id}: ${error}`);
+  }
+};
+
+export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
 ): Promise<Repository> => {
@@ -87,7 +113,7 @@ export const getData = async (
     }
     throw new Error(`No repository found with ${maxIterations} iterations`);
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(`Error fetching data: ${error}`);
   }
 };
 
