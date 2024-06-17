@@ -12,10 +12,10 @@ import {
 } from "./utils/renderer";
 import {
   getOctokitInstance,
-  getRepositories,
-  getRepos,
   verifyToken,
-  getData,
+  getRepos,
+  getRepository,
+  getRandomRepository,
   getMaxId,
 } from "./utils/octokit";
 import { getCookieId, setCookieId } from "./utils/cookie";
@@ -42,7 +42,7 @@ app.get(
   async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
     const octokit = getOctokitInstance(c);
     try {
-      const repository = await getData(octokit, Number(MAX_ID));
+      const repository = await getRandomRepository(octokit, Number(MAX_ID));
       return c.json(repository);
     } catch (error: any) {
       console.error("Error fetching repository data:", error);
@@ -56,17 +56,12 @@ app.get(
   async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
     const { id } = c.req.param();
     const octokit = getOctokitInstance(c);
-    const { data, status, url } = await getRepositories(
-      octokit,
-      Number(id) - 1
-    ); // (id - 1) because since starts from next id
-    if (status === 200) {
-      if (data.length === 0) {
-        return c.json({ error: "Repository not found" }, 404);
-      }
-      return c.json(data[0]);
-    } else {
-      return c.json({ error: `${status} error at ${url}` }, 500);
+    try {
+      const repository = await getRepository(octokit, Number(id));
+      return c.json(repository);
+    } catch (error: any) {
+      console.error("Error fetching repository data:", error);
+      return c.json({ error: "Failed to fetch repository data" }, 500);
     }
   }
 );
