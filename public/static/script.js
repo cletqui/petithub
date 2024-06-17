@@ -4,8 +4,6 @@ function getCookie(name) {
 }
 
 const maxIdCookie = getCookie("max_id");
-if (maxIdCookie) {
-  console.log("max_id =", maxIdCookie);
-} else {
+if (!maxIdCookie) {
   fetch("/id");
 }
