@@ -10,13 +10,26 @@ export interface Repository {
   id: number;
   name: string;
   full_name: string;
+  private?: boolean;
   owner: {
     login: string;
+    avatar_url?: string;
     html_url: string;
   };
   fork: boolean;
   description: string | null;
   html_url: string;
+  homepage?: string | null;
+  size?: number;
+  stargazers_count?: number;
+  watchers_count?: number;
+  language?: string | null;
+  forks_count?: number;
+  topics?: string[];
+  visibility?: string;
+  open_issues?: number;
+  default_branch?: string;
+  subscribers_count?: number;
 }
 
 export const RepositoryContainer = async ({
@@ -50,18 +63,39 @@ export const Container = ({
     id,
     name,
     full_name,
-    owner: { login, html_url: owner_html_url },
+    private: private_status,
+    owner: { login, avatar_url, html_url: owner_html_url },
     description,
     html_url,
-    // forks_count,
-    // stargazers_count,
-    // watchers_count,
-    // subscribers_count,
-    // size,
+    homepage,
+    size,
+    stargazers_count,
+    watchers_count,
+    language,
+    forks_count,
+    topics,
+    visibility,
+    open_issues,
+    default_branch,
+    subscribers_count,
   } = repository;
+  console.log(repository);
   return (
     <div class="container">
-      <h2>{name}</h2>
+      <h2>
+        <a target="_blank" rel="noopener noreferrer" href={owner_html_url}>
+          <img class="avatar" src={avatar_url} alt="avatar_url" />
+        </a>
+        <a
+          class="title"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={html_url}
+        >
+          {name}
+        </a>
+        <span class="visibility-badge">{visibility}</span>
+      </h2>
       <h3>
         {full_name} <i>({id})</i>
       </h3>
@@ -85,6 +119,8 @@ export const Container = ({
           {login}
         </a>
       </p>
+      <p>{`private: ${private_status}, homepage: ${homepage}, forks: ${forks_count}, stars: ${stargazers_count}, watchers: ${watchers_count}, subscribers: ${subscribers_count}, size: ${size}`}</p>
+      <p>{`language: ${language}, topics: ${topics}, visibility: ${visibility}, open_issues: ${open_issues}, default_branch: ${default_branch}`}</p>
     </div>
   );
 }; // TODO add more metadata (languages, tags, topics, stargazers, watchers, branches, commits, downloads)
