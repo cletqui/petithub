@@ -138,7 +138,13 @@ export const Container = ({
           {description && <p>{description}</p>}
           {homepage && (
             <p>
-              <a href={homepage}>{homepage}</a>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${new URL(homepage)}`}
+              >
+                {homepage}
+              </a>
             </p>
           )}
           {topics && topics?.length > 0 && <p>{JSON.stringify(topics)}</p>}
