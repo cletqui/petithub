@@ -16,7 +16,7 @@ npm run deploy
 ## TODO
 
 - [ ] Write `README.md`
-- [ ] Change the document title dynamically
+- [ ] Change the document title dynamically (with nested `Suspense`)
 - [ ] Improve GUI
   - [x] add additional info about the repo
   - [ ] mimic GitHub layout

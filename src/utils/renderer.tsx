@@ -25,7 +25,7 @@ export interface Repository {
   watchers_count?: number;
   language?: string | null;
   forks_count?: number;
-  license?: { key: string; name: string } | null;
+  license?: { key?: string; name?: string } | null;
   topics?: string[];
   visibility?: string;
   open_issues?: number;
