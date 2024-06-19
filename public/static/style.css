@@ -1,3 +1,4 @@
+/* RENDERER */
 html,
 body {
   height: 100%;
@@ -11,8 +12,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: var(--body-bg-color);
-  color: var(--body-color);
+  background-color: var(--bg-color);
+  color: var(--font-color);
 }
 .container-wrapper {
   display: flex;
@@ -23,28 +24,37 @@ body {
 }
 .container {
   width: 80%;
-  max-width: 69vmin;
+  max-width: 80vmin;
   padding: 20px;
   background-color: var(--container-bg-color);
-  border: 1px solid var(--container-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 0.5em;
-  box-shadow: 0 1px 3px rgba(27, 31, 35, 0.12),
-    0 8px 24px rgba(27, 31, 35, 0.12); /* TODO change to var */
-} /* TODO */
-h1 {
+  box-shadow: 0 1px 3px var(--container-bg-color), 0 8px 24px var(--bg-color);
+}
+.title {
   font-size: 2rem;
   font-weight: 600;
   color: var(--font-color);
   margin-bottom: 20px;
 }
-h2 {
+a {
+  color: var(--font-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* CONTAINER */
+/* Title */
+.container-title {
   display: flex !important;
   flex-wrap: wrap !important;
   align-items: center !important;
   box-sizing: border-box;
-}
-h2 a {
-  display: flex;
+  margin-bottom: 10px;
+  padding: 1rem 0;
+  border-bottom: max(1px, 0.0625rem) solid var(--border-color) !important;
 }
 .avatar {
   border-radius: 50% !important;
@@ -59,7 +69,7 @@ h2 a {
   max-height: 2rem;
   margin: 0 0.42em 0 0;
 }
-.title {
+.repo-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--font-color);
@@ -77,112 +87,89 @@ h2 a {
   text-transform: capitalize;
   margin-left: 0.5rem !important;
 }
-h3 {
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--h3-color);
-  margin-top: 20px;
-  border-bottom: 1px solid var(--h3-border-color);
-  padding-bottom: 8px;
-} /* TODO */
-p {
-  margin-top: 10px;
-  color: var(--p-color);
+/* Layout */
+.container-layout {
+  max-width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 2rem;
 }
-a {
-  color: var(--a-color);
-  text-decoration: none;
+.layout-main {
+  grid-column: 1;
+  display: flex;
+  -moz-box-pack: justify;
+  justify-content: space-between;
+  align-self: self-start;
+  text-align: start;
+  -moz-box-flex: 1;
+  flex-grow: 1;
+  padding-bottom: 16px;
+  padding-top: 8px;
 }
-a:hover {
-  text-decoration: underline;
+.layout-sidebar {
+  padding: 1rem 0;
+  grid-column: 2;
 }
-.repo-link {
-  display: inline-block;
-  margin: 10px 0;
-  padding: 8px 16px;
-  font-size: 1rem;
-  color: #ffffff;
-  background-color: var(--repo-link-bg-color);
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+.button {
+  display: flex;
+  -webkit-appearance: button;
+  appearance: button;
+  gap: 3px;
   border-radius: 6px;
+  border-style: hidden;
+  cursor: pointer;
+  font-family: inherit;
+  align-items: center;
+  align-self: center;
+}
+.button a {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  margin: 5px 0 4px;
+}
+.button a:hover {
   text-decoration: none;
 }
-.repo-link:hover {
-  background-color: var(--repo-link-bg-hover-color);
+.icon {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.small-icon {
+  width: 1rem;
+  height: 1rem;
+}
+.code-button {
+  font-size: 14px;
+  background-color: var(--code-bg-color);
+  border-color: var(--border-color);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.code-button:hover {
+  background-color: var(--code-bg-hover-color);
+}
+.code-button img {
+  margin: 0 3px;
+  filter: var(--svg-font-color);
 }
 
-.author-link {
-  color: var(--author-link-color);
-}
-.author-link:hover {
-  color: var(--author-link-hover-color);
-}
+/* FOOTER */
 .footer {
   width: 100%;
   text-align: center;
   padding: 0.5em 0;
   font-size: 0.875rem;
-  color: var(--footer-color);
-  border-top: 1px solid var(--footer-border-color);
+  color: var(--font-color);
+  border-top: 1px solid var(--border-color);
 }
-/* Light Theme */
-@media (prefers-color-scheme: light) {
-  :root {
-    --font-color: red; /* TODO */
-    --font-color-muted: red; /* TODO */
-    --border-color: red; /* TODO */
-    --body-bg-color: #ffffff;
-    --body-color: #24292e;
-    --container-bg-color: #ffffff;
-    --container-border-color: #e1e4e8;
-    --h1-color: #24292f;
-    --h2-color: #0366d6;
-    --h3-color: #586069;
-    --h3-border-color: #eaecef;
-    --p-color: #586069;
-    --a-color: #0366d6;
-    --repo-link-bg-color: #28a745;
-    --repo-link-bg-hover-color: #269f42;
-    --author-link-color: #586069;
-    --author-link-hover-color: #0366d6;
-    --footer-color: #586069;
-    --footer-border-color: #eaecef;
-    --svg-icon-color: invert(39%) sepia(5%) saturate(870%) hue-rotate(171deg)
-      brightness(94%) contrast(95%); /* #586069 */
-    --svg-icon-color-hover: invert(11%) sepia(25%) saturate(460%)
-      hue-rotate(172deg) brightness(92%) contrast(87%); /* #24292f */
-  }
-}
-/* Dark Theme */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --font-color: #e6edf3;
-    --font-color-muted: #8d96a0;
-    --border-color: #30363d;
-    --body-bg-color: #0d1117; /* TODO */
-    --body-color: #c9d1d9; /* TODO */
-    --container-bg-color: #161b22; /* TODO */
-    --container-border-color: #30363d; /* TODO */
-    --h1-color: #c9d1d9; /* TODO */
-    --h2-color: #58a6ff; /* TODO */
-    --h3-color: #8b949e; /* TODO */
-    --h3-border-color: #30363d; /* TODO */
-    --p-color: #8b949e; /* TODO */
-    --a-color: #58a6ff; /* TODO */
-    --repo-link-bg-color: #238636; /* TODO */
-    --repo-link-bg-hover-color: #2ea043; /* TODO */
-    --author-link-color: #8b949e; /* TODO */
-    --author-link-hover-color: #58a6ff; /* TODO */
-    --footer-color: #8b949e; /* TODO */
-    --footer-border-color: #30363d; /* TODO */
-    --svg-icon-color: invert(61%) sepia(6%) saturate(595%) hue-rotate(171deg)
-      brightness(95%) contrast(87%); /* #8b949e */ /* TODO */
-    --svg-icon-color-hover: invert(81%) sepia(5%) saturate(357%)
-      hue-rotate(168deg) brightness(106%) contrast(86%); /* c9d1d9 */ /* TODO */
-  }
-}
-
-/* Footer icons */
-.icon {
+.footer .icon {
   display: inline-block;
   width: 1.5rem;
   height: 1.5rem;
@@ -192,13 +179,12 @@ a:hover {
   transition: filter 0.3s;
   transition: transform 0.3s;
 }
-
-.icon:hover {
+.footer .icon:hover {
   filter: var(--svg-icon-color-hover);
   transform: scale(1.1);
 }
 
-/* Loader */
+/* LOADER */
 .lds-ripple,
 .lds-ripple div {
   box-sizing: border-box;
@@ -247,5 +233,56 @@ a:hover {
     width: 80px;
     height: 80px;
     opacity: 0;
+  }
+}
+
+/* THEMES */
+/* Light */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: red; /* TODO */
+    --container-bg-color: red; /* TODO */
+    --font-color: red; /* TODO */
+    --font-color-muted: red; /* TODO */
+    --border-color: red; /* TODO */
+
+    --p-color: #586069;
+    --a-color: #0366d6;
+    --repo-link-bg-color: #28a745;
+    --repo-link-bg-hover-color: #269f42;
+    --author-link-color: #586069;
+    --author-link-hover-color: #0366d6;
+    --footer-color: #586069;
+    --footer-border-color: #eaecef;
+    --svg-icon-color: invert(39%) sepia(5%) saturate(870%) hue-rotate(171deg)
+      brightness(94%) contrast(95%); /* #586069 */
+    --svg-icon-color-hover: invert(11%) sepia(25%) saturate(460%)
+      hue-rotate(172deg) brightness(92%) contrast(87%); /* #24292f */
+  }
+}
+/* Dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #010409;
+    --container-bg-color: #0d1117;
+    --font-color: #e6edf3;
+    --font-color-muted: #8d96a0;
+    --border-color: #30363d;
+    --code-bg-color: #238636;
+    --code-bg-hover-color: #29903b;
+    --svg-font-color: brightness(0) saturate(100%) invert(95%) sepia(9%)
+      saturate(196%) hue-rotate(174deg) brightness(99%) contrast(92%); /* #e6edf3 */
+    --svg-icon-color: invert(61%) sepia(6%) saturate(595%) hue-rotate(171deg)
+      brightness(95%) contrast(87%); /* #8b949e */
+    --svg-icon-color-hover: invert(81%) sepia(5%) saturate(357%)
+      hue-rotate(168deg) brightness(106%) contrast(86%); /* c9d1d9 */
+
+    --p-color: #8b949e; /* TODO */
+    --a-color: #58a6ff; /* TODO */
+    --repo-link-bg-color: #238636; /* TODO */
+    --author-link-color: #8b949e; /* TODO */
+    --author-link-hover-color: #58a6ff; /* TODO */
+    --footer-color: #8b949e; /* TODO */
+    --footer-border-color: #30363d; /* TODO */
   }
 }

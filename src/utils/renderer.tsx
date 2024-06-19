@@ -25,12 +25,13 @@ export interface Repository {
   watchers_count?: number;
   language?: string | null;
   forks_count?: number;
+  license?: { key: string; name: string } | null;
   topics?: string[];
   visibility?: string;
   open_issues?: number;
   default_branch?: string;
   subscribers_count?: number;
-}
+} // TODO complete this interface
 
 export const RepositoryContainer = async ({
   octokit,
@@ -63,51 +64,98 @@ export const Container = ({
     id,
     name,
     full_name,
-    private: private_status,
     owner: { login, avatar_url, html_url: owner_html_url },
     description,
     html_url,
     homepage,
-    size,
     stargazers_count,
     watchers_count,
     language,
     forks_count,
+    license,
     topics,
     visibility,
-    open_issues,
     default_branch,
     subscribers_count,
   } = repository;
   console.log(repository);
   return (
     <div class="container">
-      <h2>
-        <a target="_blank" rel="noopener noreferrer" href={owner_html_url}>
+      <div class="container-title">
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href={owner_html_url}
+          title={login}
+        >
           <img class="avatar" src={avatar_url} alt="avatar_url" />
         </a>
         <a
-          class="title"
+          class="repo-title"
           target="_blank"
           rel="noopener noreferrer"
           href={html_url}
+          title={`${full_name} (${id})`}
         >
           {name}
         </a>
         <span class="visibility-badge">{visibility}</span>
-      </h2>
-      <h3>
-        {full_name} <i>({id})</i>
-      </h3>
-      <p>{description}</p>
-      <a
-        class="repo-link"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={html_url}
-      >
-        {"Visit Repository"}
-      </a>
+      </div>
+      <div class="container-layout">
+        <div class="layout-main">
+          <div class="row">
+            <button id="branch-button" class="button">
+              <img src="/static/icons/branch.svg" alt="branch" class="icon" />
+              <div>{default_branch}</div>
+            </button>
+            <button id="watch-button" class="button">
+              <img src="/static/icons/eye.svg" alt="watch" class="icon" />
+              <div>{`Watch ${watchers_count}`}</div>
+            </button>
+            <button id="fork-button" class="button">
+              <img src="/static/icons/fork.svg" alt="fork" class="icon" />
+              <div>{`Fork ${forks_count}`}</div>
+            </button>
+            <button id="star-button" class="button">
+              <img src="/static/icons/star.svg" alt="star" class="icon" />
+              <div>{`Star ${stargazers_count}`}</div>
+            </button>
+          </div>
+          <button id="code-button" class="button code-button">
+            <a target="_blank" rel="noopener noreferrer" href={html_url}>
+              <img src="/static/icons/code.svg" alt="code" class="icon icon" />
+              <div>{"Code"}</div>
+              <img
+                src="/static/icons/triangle.svg"
+                alt="go"
+                class="icon small-icon"
+              />
+            </a>
+          </button>
+        </div>
+        <div class="layout-sidebar">
+          <b>{"About"}</b>
+          {description && <p>{description}</p>}
+          {homepage && (
+            <p>
+              <a href={homepage}>{homepage}</a>
+            </p>
+          )}
+          {topics && topics?.length > 0 && <p>{JSON.stringify(topics)}</p>}
+          {!description && !homepage && topics?.length === 0 && (
+            <p>
+              <i>{"No description, website, or topics provided."}</i>
+            </p>
+          )}
+          {license && <p>{`${license.key} license`}</p>}
+          <p>{"Activity"}</p>
+          <p>{`${stargazers_count} stars`}</p>
+          <p>{`${watchers_count} watching`}</p>
+          <p>{`${forks_count} forks`}</p>
+          <b>{"Languages"}</b>
+          <p>{language}</p>
+        </div>
+      </div>
       <p>
         {"by "}
         <a
@@ -119,8 +167,7 @@ export const Container = ({
           {login}
         </a>
       </p>
-      <p>{`private: ${private_status}, homepage: ${homepage}, forks: ${forks_count}, stars: ${stargazers_count}, watchers: ${watchers_count}, subscribers: ${subscribers_count}, size: ${size}`}</p>
-      <p>{`language: ${language}, topics: ${topics}, visibility: ${visibility}, open_issues: ${open_issues}, default_branch: ${default_branch}`}</p>
+      <p>{`subscribers: ${subscribers_count}`}</p>
     </div>
   );
 }; // TODO add more metadata (languages, tags, topics, stargazers, watchers, branches, commits, downloads)
@@ -148,7 +195,7 @@ export const renderer = jsxRenderer(
         </head>
         <body>
           <header class="header">
-            <h1>PetitHub</h1>
+            <h1 class="title">{"PetitHub"}</h1>
           </header>
           <div class="container-wrapper">{children}</div>
           <footer class="footer">
@@ -157,6 +204,7 @@ export const renderer = jsxRenderer(
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://github.com/cletqui/petithub"
+                title="GitHub"
               >
                 <img
                   src="/static/icons/github.svg"
@@ -168,6 +216,7 @@ export const renderer = jsxRenderer(
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://www.buymeacoffee.com/cletqui"
+                title="BuyMeACoffee"
               >
                 <img
                   src="/static/icons/buymeacoffee.svg"

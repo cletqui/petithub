@@ -11,6 +11,7 @@ export default defineConfig({
       entry: "src/index.tsx",
     }),
   ],
+  optimizeDeps: { include: ["hono", "octokit"] },
   test: {
     include: ["**/*.test.tsx"],
     globals: true,

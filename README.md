@@ -17,8 +17,13 @@ npm run deploy
 
 - [ ] Write `README.md`
 - [ ] Change the document title dynamically
-- [ ] Improve GUI (by adding additional info about the repo)
+- [ ] Improve GUI
+  - [x] add additional info about the repo
+  - [ ] mimic GitHub layout
+  - [ ] set page title as `full_name`
+  - [ ] cache svg imports
 - [ ] Define unit tests
+- [ ] Fix interfaces and type definitions
 - [ ] Setup GitHub Actions
   - [ ] to deploy the website to GitHub
   - [x] to run tests automatically
