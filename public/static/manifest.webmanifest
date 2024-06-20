@@ -7,7 +7,7 @@
   "description": "Explore obscure GitHub repositories.",
   "icons": [
     {
-      "src": "static/favicon.svg",
+      "src": "static/icons/favicon.svg",
       "sizes": "98x96",
       "type": "image/svg+xml"
     }

@@ -5,6 +5,7 @@ import { HtmlEscapedString } from "hono/utils/html";
 import { Octokit } from "@octokit/core";
 
 import { getRandomRepository } from "./octokit";
+import { html } from "hono/html";
 
 export interface Repository {
   id: number;
@@ -19,6 +20,9 @@ export interface Repository {
   fork: boolean;
   description: string | null;
   html_url: string;
+  created_at: string;
+  updated_at: string;
+  pushed_at: string;
   homepage?: string | null;
   size?: number;
   stargazers_count?: number;
@@ -67,6 +71,9 @@ export const Container = ({
     owner: { login, avatar_url, html_url: owner_html_url },
     description,
     html_url,
+    created_at,
+    updated_at,
+    pushed_at,
     homepage,
     stargazers_count,
     watchers_count,
@@ -76,7 +83,6 @@ export const Container = ({
     topics,
     visibility,
     default_branch,
-    subscribers_count,
   } = repository;
   console.log(repository);
   return (
@@ -135,31 +141,111 @@ export const Container = ({
         </div>
         <div class="layout-sidebar">
           <b>{"About"}</b>
-          {description && <p>{description}</p>}
-          {homepage && (
+          <p class="block">
+            {description && <>{description}</>}
+            {homepage && (
+              <>
+                {" "}
+                <img src="/static/icons/link.svg" alt="homepage" class="icon" />
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`${new URL(homepage)}`}
+                >
+                  {homepage}
+                </a>
+              </>
+            )}
+            {topics && topics?.length > 0 && <p>{JSON.stringify(topics)}</p>}
+            {!description && !homepage && topics?.length === 0 && (
+              <i>{"No description, website, or topics provided."}</i>
+            )}
+          </p>
+          <div class="block block-border">
+            {license && (
+              <p>
+                <a
+                  class="sidebar-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`${html_url}/blob/${default_branch}/LICENSE`}
+                >
+                  <img
+                    src="/static/icons/license.svg"
+                    alt="license"
+                    class="icon"
+                  />
+                  {`${license.key?.toUpperCase()} license`}
+                </a>
+              </p>
+            )}
             <p>
               <a
+                class="sidebar-link"
                 target="_blank"
                 rel="noopener noreferrer"
-                href={`${new URL(homepage)}`}
+                href={`${html_url}/activity`}
               >
-                {homepage}
+                <img
+                  src="/static/icons/activity.svg"
+                  alt="activity"
+                  class="icon"
+                />
+                {"Activity"}
               </a>
             </p>
-          )}
-          {topics && topics?.length > 0 && <p>{JSON.stringify(topics)}</p>}
-          {!description && !homepage && topics?.length === 0 && (
             <p>
-              <i>{"No description, website, or topics provided."}</i>
+              <a
+                class="sidebar-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/stargazers`}
+              >
+                <img src="/static/icons/star.svg" alt="stars" class="icon" />
+                {`${stargazers_count} stars`}
+              </a>
             </p>
+            <p>
+              <a
+                class="sidebar-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/watchers`}
+              >
+                <img src="/static/icons/eye.svg" alt="watchers" class="icon" />
+                {`${watchers_count} watching`}
+              </a>
+            </p>
+            <p>
+              <a
+                class="sidebar-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/forks`}
+              >
+                <img src="/static/icons/fork.svg" alt="forks" class="icon" />
+                {`${forks_count} forks`}
+              </a>
+            </p>
+            <p>
+              <a
+                class="sidebar-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`https://github.com/contact/report-content?content_url=${html_url}&report=${login}+%28user%29`}
+              >
+                {"Report repository"}
+              </a>
+            </p>
+          </div>
+          {language && (
+            <>
+              <b>{"Languages"}</b>
+              <div class="block">
+                <p>{language}</p>
+              </div>
+            </>
           )}
-          {license && <p>{`${license.key} license`}</p>}
-          <p>{"Activity"}</p>
-          <p>{`${stargazers_count} stars`}</p>
-          <p>{`${watchers_count} watching`}</p>
-          <p>{`${forks_count} forks`}</p>
-          <b>{"Languages"}</b>
-          <p>{language}</p>
         </div>
       </div>
       <p>
@@ -173,10 +259,21 @@ export const Container = ({
           {login}
         </a>
       </p>
-      <p>{`subscribers: ${subscribers_count}`}</p>
+      <p>
+        <img src="/static/icons/create.svg" alt="license" class="icon" />
+        {`created at ${created_at}`}
+      </p>
+      <p>
+        <img src="/static/icons/update.svg" alt="license" class="icon" />
+        {`updated at ${updated_at}`}
+      </p>
+      <p>
+        <img src="/static/icons/push.svg" alt="license" class="icon" />
+        {`pushed at ${pushed_at}`}
+      </p>
     </div>
   );
-}; // TODO add more metadata (languages, tags, topics, stargazers, watchers, branches, commits, downloads)
+};
 
 export const renderer = jsxRenderer(
   ({ children, title }: PropsWithChildren<{ title?: string }>): JSX.Element => {
