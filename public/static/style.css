@@ -55,6 +55,7 @@ a:hover {
   margin-bottom: 10px;
   padding: 1rem 0;
   border-bottom: max(1px, 0.0625rem) solid var(--border-color) !important;
+  gap: 1rem;
 }
 .avatar {
   border-radius: 50% !important;
@@ -67,7 +68,6 @@ a:hover {
   box-sizing: border-box;
   max-width: 2rem;
   max-height: 2rem;
-  margin: 0 0.42em 0 0;
 }
 .repo-title {
   font-size: 1.5rem;
@@ -85,7 +85,6 @@ a:hover {
   padding: 0 7px;
   white-space: nowrap;
   text-transform: capitalize;
-  margin-left: 0.5rem !important;
 }
 /* Layout */
 .container-layout {
@@ -96,6 +95,8 @@ a:hover {
 }
 .layout-main {
   flex: 1;
+}
+.layout-main-header {
   display: flex;
   -moz-box-pack: justify;
   justify-content: space-between;
@@ -103,10 +104,11 @@ a:hover {
   text-align: start;
   -moz-box-flex: 1;
   padding-top: 0.5rem;
+  padding-bottom: 1rem;
 }
 .layout-sidebar {
   flex: 1;
-  padding-top: .8rem;
+  padding-top: 0.8rem;
   max-width: 30%;
 }
 .layout-sidebar p a {
@@ -130,6 +132,54 @@ a:hover {
   flex-direction: row;
   gap: 8px;
 }
+.main-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0px;
+  border-width: 1px;
+  border-style: solid;
+  border-image: none;
+  border-color: var(--border-color);
+  border-radius: 6px;
+  table-layout: fixed;
+  overflow: unset;
+  box-sizing: border-box;
+  font-size: 0.875rem;
+}
+.main-table thead {
+  display: none;
+}
+.main-table tbody tr td {
+  border-top: 1px solid var(--border-color) !important;
+  padding: 0.5rem 0.2rem;
+}
+.main-table tbody tr:first-child td {
+  border-top: none !important;
+}
+.avatar-row {
+  background-color: var(--bg-color-muted);
+  padding-top: 0;
+}
+.label-column {
+  padding-left: 1rem !important;
+  text-align: left;
+}
+.label-column .avatar {
+  margin-left: 0 !important;
+  margin-right: 0.75rem !important;
+  filter: initial !important;
+}
+.label-column .icon {
+  margin-left: 0.25rem;
+  margin-right: 1rem;
+  filter: var(--svg-font-color-muted);
+  vertical-align: middle;
+}
+.ago-column {
+  padding-right: 1rem !important;
+  text-align: right;
+  white-space: nowrap;
+}
 .block {
   margin-bottom: 1.5rem;
   color: var(--font-color-muted);
@@ -140,17 +190,27 @@ a:hover {
 .button {
   display: flex;
   -webkit-appearance: button;
+  color: var(--font-color-rest);
+  background-color: var(--bg-color-rest);
   appearance: button;
   gap: 3px;
   border-radius: 6px;
-  border-style: hidden;
+  border-width: 1px;
+  border-color: var(--border-color);
+  border-style: solid;
+  border-image: none;
   cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
   font-family: inherit;
   align-items: center;
   align-self: center;
   font-size: 14px;
   gap: 6px;
   padding: 0.25rem 0.75rem;
+}
+.button:hover {
+  background-color: var(--bg-color-hover);
 }
 .button a {
   display: flex;
@@ -161,21 +221,21 @@ a:hover {
 .button a:hover {
   text-decoration: none;
 }
+.button .icon {
+  filter: var(--svg-color-rest);
+}
 .icon {
   display: inline-block;
   width: 1.5rem;
   height: 1.5rem;
 }
 .small-icon {
-  width: 1rem;
-  height: 1rem;
+  max-width: 1rem;
+  max-height: 1rem;
 }
 .code-button {
   color: var(--font-color);
   background-color: var(--code-bg-color);
-  border-color: var(--border-color);
-  text-decoration: none;
-  box-sizing: border-box;
 }
 .code-button:hover {
   background-color: var(--code-bg-hover-color);
@@ -296,9 +356,13 @@ a:hover {
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-color: #010409;
+    --bg-color-hover: #292e36;
+    --bg-color-rest: #21262d;
+    --bg-color-muted: #161b22;
     --container-bg-color: #0d1117;
     --font-color: #e6edf3;
     --font-color-muted: #8d96a0;
+    --font-color-rest: #c9d1d9;
     --border-color: #30363d;
     --code-bg-color: #238636;
     --code-bg-hover-color: #29903b;
@@ -313,13 +377,7 @@ a:hover {
       hue-rotate(168deg) brightness(106%) contrast(86%); /* #c9d1d9 */
     --svg-sidebar-hover-color: invert(45%) sepia(75%) saturate(526%)
       hue-rotate(175deg) brightness(105%) contrast(95%); /* #4493f8 */
-
-    --p-color: #8b949e; /* TODO */
-    --a-color: #58a6ff; /* TODO */
-    --repo-link-bg-color: #238636; /* TODO */
-    --author-link-color: #8b949e; /* TODO */
-    --author-link-hover-color: #58a6ff; /* TODO */
-    --footer-color: #8b949e; /* TODO */
-    --footer-border-color: #30363d; /* TODO */
+    --svg-color-rest: invert(86%) sepia(13%) saturate(153%) hue-rotate(169deg)
+      brightness(100%) contrast(81%); /* #c9d1d9 */
   }
 }

@@ -95,6 +95,20 @@ app.get(
   }
 );
 
+app.get(
+  "/petithub",
+  async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
+    const octokit = getOctokitInstance(c);
+    const { data: repository } = await getRepos(octokit, "cletqui", "petithub");
+    return c.render(
+      <Suspense fallback={<Loader />}>
+        <Container repository={repository} />
+      </Suspense>,
+      { title: "PetitHub - cletqui/petithub" }
+    );
+  }
+);
+
 app.get("/", async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
   const octokit = getOctokitInstance(c);
   const cookieId = getCookieId(c);

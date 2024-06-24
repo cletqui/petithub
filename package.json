@@ -1,6 +1,6 @@
 {
   "name": "petithub",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "private": false,
   "description": "PetitHub - Explore obscure GitHub repositories",
   "author": {
@@ -34,7 +34,7 @@
     "octokit": "^4.0.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240614.0",
+    "@cloudflare/workers-types": "^4.20240620.0",
     "@hono/vite-cloudflare-pages": "^0.4.1",
     "@hono/vite-dev-server": "^0.12.2",
     "vite": "^5.3.1",

@@ -5,7 +5,7 @@ import { HtmlEscapedString } from "hono/utils/html";
 import { Octokit } from "@octokit/core";
 
 import { getRandomRepository } from "./octokit";
-import { html } from "hono/html";
+import { timeAgo } from "./time";
 
 export interface Repository {
   id: number;
@@ -20,9 +20,9 @@ export interface Repository {
   fork: boolean;
   description: string | null;
   html_url: string;
-  created_at: string;
-  updated_at: string;
-  pushed_at: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+  pushed_at?: string | null;
   homepage?: string | null;
   size?: number;
   stargazers_count?: number;
@@ -83,8 +83,19 @@ export const Container = ({
     topics,
     visibility,
     default_branch,
+    subscribers_count,
   } = repository;
   console.log(repository);
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+  const now = new Date();
   return (
     <div class="container">
       <div class="container-title">
@@ -109,40 +120,136 @@ export const Container = ({
       </div>
       <div class="container-layout">
         <div class="layout-main">
-          <div class="row">
-            <button id="branch-button" class="button">
-              <img src="/static/icons/branch.svg" alt="branch" class="icon" />
-              <div>{default_branch}</div>
-            </button>
-            <button id="watch-button" class="button">
-              <img src="/static/icons/eye.svg" alt="watch" class="icon" />
-              <div>{`Watch ${watchers_count}`}</div>
-            </button>
-            <button id="fork-button" class="button">
-              <img src="/static/icons/fork.svg" alt="fork" class="icon" />
-              <div>{`Fork ${forks_count}`}</div>
-            </button>
-            <button id="star-button" class="button">
-              <img src="/static/icons/star.svg" alt="star" class="icon" />
-              <div>{`Star ${stargazers_count}`}</div>
+          <div class="layout-main-header">
+            <div class="row">
+              <button id="branch-button" class="button">
+                <img src="/static/icons/branch.svg" alt="branch" class="icon" />
+                <div>{default_branch}</div>
+              </button>
+              <button id="watch-button" class="button">
+                <img src="/static/icons/eye.svg" alt="watch" class="icon" />
+                <div>{`Watch ${
+                  (watchers_count || 0) + (subscribers_count || 0)
+                }`}</div>
+              </button>
+              <button id="fork-button" class="button">
+                <img src="/static/icons/fork.svg" alt="fork" class="icon" />
+                <div>{`Fork ${forks_count || 0}`}</div>
+              </button>
+              <button id="star-button" class="button">
+                <img src="/static/icons/star.svg" alt="star" class="icon" />
+                <div>{`Star ${stargazers_count || 0}`}</div>
+              </button>
+            </div>
+            <button id="code-button" class="button code-button">
+              <a target="_blank" rel="noopener noreferrer" href={html_url}>
+                <img
+                  src="/static/icons/code.svg"
+                  alt="code"
+                  class="icon icon"
+                />
+                <div>{"Code"}</div>
+                <img
+                  src="/static/icons/triangle.svg"
+                  alt="go"
+                  class="icon small-icon"
+                />
+              </a>
             </button>
           </div>
-          <button id="code-button" class="button code-button">
-            <a target="_blank" rel="noopener noreferrer" href={html_url}>
-              <img src="/static/icons/code.svg" alt="code" class="icon icon" />
-              <div>{"Code"}</div>
-              <img
-                src="/static/icons/triangle.svg"
-                alt="go"
-                class="icon small-icon"
-              />
-            </a>
-          </button>
+          <table class="main-table">
+            <thead>
+              <tr>
+                <th>{"label"}</th>
+                <th>{"value"}</th>
+                <th>{"date"}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="avatar-row">
+                <td class="label-column">
+                  <a
+                    class="author-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={owner_html_url}
+                  >
+                    <img
+                      class="avatar icon"
+                      src={avatar_url}
+                      alt="avatar_url"
+                    />
+
+                    <b>{login}</b>
+                  </a>
+                </td>
+                <td />
+                <td />
+              </tr>
+              {created_at && (
+                <tr>
+                  <td class="label-column">
+                    <img
+                      src="/static/icons/create.svg"
+                      alt="license"
+                      class="icon small-icon"
+                    />
+                    {"creation"}
+                  </td>
+                  <td>
+                    {new Date(created_at).toLocaleDateString(
+                      "en-GB",
+                      dateOptions
+                    )}
+                  </td>
+                  <td class="ago-column">{timeAgo(new Date(created_at))}</td>
+                </tr>
+              )}
+              {updated_at && (
+                <tr>
+                  <td class="label-column">
+                    <img
+                      src="/static/icons/update.svg"
+                      alt="license"
+                      class="icon small-icon"
+                    />
+                    {"update"}
+                  </td>
+                  <td>
+                    {new Date(updated_at).toLocaleDateString(
+                      "en-GB",
+                      dateOptions
+                    )}
+                  </td>
+                  <td class="ago-column">{timeAgo(new Date(updated_at))}</td>
+                </tr>
+              )}
+              {pushed_at && (
+                <tr>
+                  <td class="label-column">
+                    <img
+                      src="/static/icons/push.svg"
+                      alt="license"
+                      class="icon small-icon"
+                    />
+                    {"push"}
+                  </td>
+                  <td>
+                    {new Date(pushed_at).toLocaleDateString(
+                      "en-GB",
+                      dateOptions
+                    )}
+                  </td>
+                  <td class="ago-column">{timeAgo(new Date(pushed_at))}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
         <div class="layout-sidebar">
           <b>{"About"}</b>
           <p class="block">
-            {description && <>{description}</>}
+            {description && <div>{description}</div>}
             {homepage && (
               <>
                 {" "}
@@ -202,7 +309,7 @@ export const Container = ({
                 href={`${html_url}/stargazers`}
               >
                 <img src="/static/icons/star.svg" alt="stars" class="icon" />
-                {`${stargazers_count} stars`}
+                {`${stargazers_count || 0} stars`}
               </a>
             </p>
             <p>
@@ -213,7 +320,7 @@ export const Container = ({
                 href={`${html_url}/watchers`}
               >
                 <img src="/static/icons/eye.svg" alt="watchers" class="icon" />
-                {`${watchers_count} watching`}
+                {`${(watchers_count || 0) + (subscribers_count || 0)} watching`}
               </a>
             </p>
             <p>
@@ -224,7 +331,7 @@ export const Container = ({
                 href={`${html_url}/forks`}
               >
                 <img src="/static/icons/fork.svg" alt="forks" class="icon" />
-                {`${forks_count} forks`}
+                {`${forks_count || 0} forks`}
               </a>
             </p>
             <p>
@@ -248,29 +355,6 @@ export const Container = ({
           )}
         </div>
       </div>
-      <p>
-        {"by "}
-        <a
-          class="author-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          href={owner_html_url}
-        >
-          {login}
-        </a>
-      </p>
-      <p>
-        <img src="/static/icons/create.svg" alt="license" class="icon" />
-        {`created at ${created_at}`}
-      </p>
-      <p>
-        <img src="/static/icons/update.svg" alt="license" class="icon" />
-        {`updated at ${updated_at}`}
-      </p>
-      <p>
-        <img src="/static/icons/push.svg" alt="license" class="icon" />
-        {`pushed at ${pushed_at}`}
-      </p>
     </div>
   );
 };
