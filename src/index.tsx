@@ -70,7 +70,8 @@ app.get(
   "/id",
   async (c: Context<{ Bindings: Bindings }>): Promise<Response> => {
     const octokit = getOctokitInstance(c);
-    const id = await getMaxId(octokit, Number(MAX_ID));
+    const cookieId = getCookieId(c);
+    const id = await getMaxId(octokit, Number(cookieId || MAX_ID));
     setCookieId(c, id);
     const timestamp = new Date();
     return c.json({ id, timestamp });

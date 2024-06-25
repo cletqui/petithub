@@ -95,7 +95,6 @@ export const Container = ({
     minute: "2-digit",
     second: "2-digit",
   };
-  const now = new Date();
   return (
     <div class="container">
       <div class="container-title">
@@ -128,17 +127,18 @@ export const Container = ({
               </button>
               <button id="watch-button" class="button">
                 <img src="/static/icons/eye.svg" alt="watch" class="icon" />
-                <div>{`Watch ${
-                  (watchers_count || 0) + (subscribers_count || 0)
-                }`}</div>
+                <div class="label">{"Watch"}</div>
+                <div>{(watchers_count || 0) + (subscribers_count || 0)}</div>
               </button>
               <button id="fork-button" class="button">
                 <img src="/static/icons/fork.svg" alt="fork" class="icon" />
-                <div>{`Fork ${forks_count || 0}`}</div>
+                <div class="label">{"Fork"}</div>
+                <div>{forks_count || 0}</div>
               </button>
               <button id="star-button" class="button">
                 <img src="/static/icons/star.svg" alt="star" class="icon" />
-                <div>{`Star ${stargazers_count || 0}`}</div>
+                <div class="label">{"Star"}</div>
+                <div>{stargazers_count || 0}</div>
               </button>
             </div>
             <button id="code-button" class="button code-button">

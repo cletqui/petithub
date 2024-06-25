@@ -119,7 +119,23 @@ a:hover {
   margin-right: 0.6rem !important;
   filter: var(--svg-font-color-muted);
 }
+@media (max-width: 1000px) {
+  .button .label {
+    display: none;
+  }
+}
+@media (max-width: 800px) {
+  .layout-main-header {
+    display: inline-block;
+  }
+  .layout-main-header .code-button {
+    margin-top: 0.5rem;
+  }
+}
 @media (max-width: 600px) {
+  html {
+    font-size: small;
+  }
   .container-layout {
     flex-direction: column-reverse;
   }
@@ -130,18 +146,17 @@ a:hover {
 .row {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
 }
 .main-table {
   width: 100%;
+  border: 1px solid var(--border-color);
   border-collapse: separate;
   border-spacing: 0px;
-  border-width: 1px;
-  border-style: solid;
   border-image: none;
-  border-color: var(--border-color);
   border-radius: 6px;
-  table-layout: fixed;
+  table-layout: auto;
   overflow: unset;
   box-sizing: border-box;
   font-size: 0.875rem;
@@ -208,6 +223,9 @@ a:hover {
   font-size: 14px;
   gap: 6px;
   padding: 0.25rem 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
 }
 .button:hover {
   background-color: var(--bg-color-hover);
@@ -256,7 +274,8 @@ a:hover {
 .footer {
   width: 100%;
   text-align: center;
-  padding: 0.5em 0;
+  padding: 0.5rem 0;
+  margin-top: 1rem;
   font-size: 0.875rem;
   color: var(--font-color);
   border-top: 1px solid var(--border-color);
