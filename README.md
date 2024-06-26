@@ -20,8 +20,10 @@ npm run deploy
 - [ ] Improve GUI
   - [x] add additional info about the repo
   - [ ] mimic GitHub layout
-  - [ ] set page title as `full_name`
+  - [ ] set page title as `full_name` & use GitHub link in header like GitHub page
   - [ ] cache svg imports
+  - [ ] add reload button
+  - [ ] fix header hidden on small screens
 - [ ] Define unit tests
 - [ ] Fix interfaces and type definitions
 - [ ] Setup GitHub Actions

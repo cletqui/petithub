@@ -108,7 +108,6 @@ a:hover {
 }
 .layout-sidebar {
   flex: 1;
-  padding-top: 0.8rem;
   max-width: 30%;
 }
 .layout-sidebar p a {
@@ -197,10 +196,12 @@ a:hover {
 }
 .block {
   margin-bottom: 1.5rem;
-  color: var(--font-color-muted);
 }
 .block-border {
   border-bottom: max(1px, 0.0625rem) solid var(--border-color);
+}
+.muted {
+  color: var(--font-color-muted);
 }
 .button {
   display: flex;
@@ -259,6 +260,36 @@ a:hover {
   background-color: var(--code-bg-hover-color);
 }
 .code-button img {
+  filter: var(--svg-font-color);
+}
+.topic {
+  display: inline-block;
+  padding: 0 7px;
+  padding-right: 7px;
+  padding-left: 7px;
+  font-size: 12px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: 2rem;
+  padding-right: 10px;
+  padding-left: 10px;
+  margin: 0 0.125em 0.333em 0;
+  line-height: 22px;
+  background-color: var(--bg-color-topic);
+  color: var(--sidebar-hover-color);
+}
+.topic:hover {
+  text-decoration: none;
+  background-color: var(--bg-color-topic-hover);
+  color: var(--font-color);
+}
+.homepage {
+  display: flex;
+  vertical-align: middle;
+  color: var(--sidebar-hover-color);
+}
+.homepage img {
+  margin-right: 0.5rem;
   filter: var(--svg-font-color);
 }
 .sidebar-link:hover .icon {
@@ -378,6 +409,8 @@ a:hover {
     --bg-color-hover: #292e36;
     --bg-color-rest: #21262d;
     --bg-color-muted: #161b22;
+    --bg-color-topic: #388bfd1a;
+    --bg-color-topic-hover: #1f6feb;
     --container-bg-color: #0d1117;
     --font-color: #e6edf3;
     --font-color-muted: #8d96a0;

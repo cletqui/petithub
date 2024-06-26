@@ -247,11 +247,27 @@ export const Container = ({
           </table>
         </div>
         <div class="layout-sidebar">
-          <b>{"About"}</b>
-          <p class="block">
-            {description && <div>{description}</div>}
+          <div class="block">
+            <p>
+              <b>{"About"}</b>
+            </p>
+            {description && <p>{description}</p>}
+            {topics && topics?.length > 0 && (
+              <div>
+                {topics.map((topic: any) => (
+                  <a
+                    class="topic"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`https://github.com/topics/${topic}`}
+                  >
+                    {topic}
+                  </a>
+                ))}
+              </div>
+            )}
             {homepage && (
-              <>
+              <p class="homepage">
                 {" "}
                 <img src="/static/icons/link.svg" alt="homepage" class="icon" />
                 <a
@@ -261,14 +277,15 @@ export const Container = ({
                 >
                   {homepage}
                 </a>
-              </>
+              </p>
             )}
-            {topics && topics?.length > 0 && <p>{JSON.stringify(topics)}</p>}
             {!description && !homepage && topics?.length === 0 && (
-              <i>{"No description, website, or topics provided."}</i>
+              <p>
+                <i>{"No description, website, or topics provided."}</i>
+              </p>
             )}
-          </p>
-          <div class="block block-border">
+          </div>
+          <div class={`block muted ${language && "block-border"}`}>
             {license && (
               <p>
                 <a
