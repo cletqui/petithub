@@ -101,14 +101,18 @@ export const getRandomRepository = async (
           name,
           owner: { login },
         } = repo;
-        const { data: repos } = await getRepos(octokit, login, name);
-        const { stargazers_count, size } = repos;
-        if (stargazers_count === 0 && size > 0) {
-          return repos;
+        try {
+          const { data: repos } = await getRepos(octokit, login, name);
+          const { stargazers_count, size } = repos;
+          if (stargazers_count === 0 && size > 0) {
+            return repos;
+          }
+          console.log(
+            `${login}/${name} (stars: ${stargazers_count}, size: ${size})`
+          );
+        } catch (error: any) {
+          console.log(`${login}/${name} (${error})`);
         }
-        console.log(
-          `${login}/${name} (stars: ${stargazers_count}, size: ${size})`
-        );
       }
     }
     throw new Error(`No repository found with ${maxIterations} iterations`);
