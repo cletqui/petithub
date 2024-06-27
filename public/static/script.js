@@ -7,3 +7,7 @@ const maxIdCookie = getCookie("max_id");
 if (!maxIdCookie) {
   fetch("/id");
 }
+
+const refresh = () => {
+  window.location.reload();
+};

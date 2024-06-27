@@ -19,11 +19,13 @@ npm run deploy
 - [ ] Change the document title dynamically (with nested `Suspense`)
 - [ ] Improve GUI
   - [x] add additional info about the repo
-  - [ ] mimic GitHub layout
+  - [x] implement dark/light themes
+  - [x] mimic GitHub layout
   - [ ] set page title as `full_name` & use GitHub link in header like GitHub page
   - [ ] cache svg imports
-  - [ ] add reload button
-  - [ ] fix header hidden on small screens
+  - [x] add reload button
+  - [x] fix header hidden on small screens
+  - [ ] add colors for languages
 - [ ] Define unit tests
 - [ ] Fix interfaces and type definitions
 - [ ] Setup GitHub Actions

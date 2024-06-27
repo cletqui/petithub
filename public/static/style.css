@@ -9,7 +9,8 @@ body {
 }
 body {
   display: flex;
-  flex-direction: column;
+  flex-flow: row wrap;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   background-color: var(--bg-color);
@@ -17,10 +18,12 @@ body {
 }
 .container-wrapper {
   display: flex;
-  flex: 1;
+  flex: 1 0 auto;
+  box-sizing: border-box;
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-height: calc(100vh - 12rem);
 }
 .container {
   width: 80%;
@@ -34,15 +37,62 @@ body {
 
 /* HEADER */
 .header {
-  display: block;
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 100%;
+  min-height: 2rem;
+  box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
+  flex-direction: row;
+  -moz-box-align: center;
+  align-items: center;
+  -moz-box-pack: justify;
+  justify-content: space-between;
 }
-.title {
+.header a {
+  display: flex;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
+  flex-direction: row;
+}
+.header .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 1rem;
+  cursor: pointer;
+  filter: var(--svg-icon-color);
+}
+.header .title {
   font-size: 2rem;
   font-weight: 600;
   color: var(--font-color-default);
   margin-bottom: 20px;
+  display: flex;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
+  flex-direction: row;
+  -moz-box-align: center;
+  align-items: center;
+}
+.header .refresh {
+  -moz-box-align: center;
+  -moz-box-pack: end;
+  animation: 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0s 1 refresh;
+  transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.header .refresh:hover {
+  transform: rotate(90deg);
+}
+@keyframes refresh {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* CONTAINER */
@@ -314,9 +364,11 @@ a:hover {
 
 /* FOOTER */
 .footer {
+  flex: 0 0 auto;
   width: 100%;
   text-align: center;
   padding: 0.5rem 0;
+  min-height: 1rem;
   margin-top: 1rem;
   font-size: 0.875rem;
   color: var(--font-color-default);

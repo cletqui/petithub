@@ -191,7 +191,7 @@ export const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/create.svg"
-                      alt="license"
+                      alt="create"
                       class="icon small-icon"
                     />
                     {"creation"}
@@ -210,7 +210,7 @@ export const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/update.svg"
-                      alt="license"
+                      alt="update"
                       class="icon small-icon"
                     />
                     {"update"}
@@ -229,7 +229,7 @@ export const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/push.svg"
-                      alt="license"
+                      alt="push"
                       class="icon small-icon"
                     />
                     {"push"}
@@ -399,7 +399,24 @@ export const renderer = jsxRenderer(
         </head>
         <body>
           <header class="header">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/"
+              title="GitHub"
+            >
+              <img
+                src="/static/icons/github.svg"
+                alt="GitHub"
+                class="icon github-icon"
+              />
+            </a>
             <h1 class="title">{"PetitHub"}</h1>
+            <img
+              class="icon refresh"
+              src="/static/icons/refresh.svg"
+              onclick="window.location.reload()"
+            />
           </header>
           <div class="container-wrapper">{children}</div>
           <footer class="footer">
