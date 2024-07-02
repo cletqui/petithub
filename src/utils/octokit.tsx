@@ -1,16 +1,35 @@
-import { Context } from "hono";
+import { Context, MiddlewareHandler, Next } from "hono";
 import { Octokit } from "@octokit/core";
 import { OctokitResponse } from "@octokit/types";
 
 import { Repository } from "./renderer";
-import { Bindings } from "..";
+import { Bindings, Variables } from "..";
+
+export const apiAuth = (): MiddlewareHandler => {
+  /* inspired from hono/bearer-auth */
+  return async function apiAuth(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ) {
+    const { access_token } = c.var;
+    const accessToken = access_token || c.req.header("Authorization");
+    if (accessToken) {
+      if (await verifyToken(accessToken, c)) {
+        await next();
+      }
+    }
+    return c.text("Unauthorized", 401);
+  };
+};
 
 export const getOctokitInstance = (
-  c: Context<{ Bindings: Bindings }>
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
+  token?: string
 ): Octokit => {
-  const { GITHUB_TOKEN } = c.env;
+  const { access_token } = c.var;
+  const accessToken = token || access_token;
   return new Octokit({
-    auth: GITHUB_TOKEN,
+    auth: accessToken,
     headers: {
       accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
@@ -20,10 +39,9 @@ export const getOctokitInstance = (
 
 export const verifyToken = async (
   token: string,
-  c: Context<{ Bindings: Bindings }>
-) => {
-  c.env.GITHUB_TOKEN = token;
-  const octokit = getOctokitInstance(c);
+  c: Context<{ Bindings: Bindings; Variables: Variables }>
+): Promise<boolean> => {
+  const octokit = getOctokitInstance(c, token);
   try {
     const { status } = await getRepos(octokit, "octocat", "Hello-World");
     return status === 200;
@@ -39,7 +57,7 @@ const getRepositories = async (
   try {
     return await octokit.request("GET /repositories", { since });
   } catch (error: any) {
-    throw new Error(`Error fetching repositories since ${since}: ${error}`);
+    throw error;
   }
 };
 
@@ -51,7 +69,7 @@ export const getRepos = async (
   try {
     return await octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
-    throw new Error(`Error fetching repository for ${owner}/${repo}: ${error}`);
+    throw error;
   }
 };
 
@@ -80,7 +98,7 @@ export const getRepository = async (
       throw new Error(`${status} error at ${url}`);
     }
   } catch (error: any) {
-    throw new Error(`Error fetching repository for id=${id}: ${error}`);
+    throw error;
   }
 };
 
@@ -117,7 +135,7 @@ export const getRandomRepository = async (
     }
     throw new Error(`No repository found with ${maxIterations} iterations`);
   } catch (error: any) {
-    throw new Error(`Error fetching data: ${error}`);
+    throw error;
   }
 };
 

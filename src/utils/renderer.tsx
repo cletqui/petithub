@@ -7,6 +7,15 @@ import { Octokit } from "@octokit/core";
 import { getRandomRepository } from "./octokit";
 import { timeAgo } from "./time";
 
+interface OctokitErrorResponse {
+  status: number;
+  response: {
+    data: {
+      message: string;
+    };
+  };
+}
+
 export interface Repository {
   id: number;
   name: string;
@@ -44,20 +53,57 @@ export const RepositoryContainer = async ({
   octokit: Octokit;
   maxId: number;
 }): Promise<HtmlEscapedString> => {
-  const repository = await getRandomRepository(octokit, maxId);
-  /* const { full_name } = repository;
-  const title = `PetitHub - ${full_name}`; */
-  return <Container repository={repository} />;
+  try {
+    const repository = await getRandomRepository(octokit, maxId);
+    /* const { full_name } = repository;
+    const title = `PetitHub - ${full_name}`; */
+    return <Container repository={repository} />;
+  } catch (error: any) {
+    const {
+      status,
+      response: {
+        data: { message },
+      },
+    } = (error as OctokitErrorResponse) || {};
+    if (status && status === 403) {
+      return <Login message={message} />;
+    } else {
+      return <Loader />;
+    }
+  }
 };
 
 export const Loader = (): JSX.Element => {
   return (
     <div class="lds-ripple">
-      <div></div>
-      <div></div>
+      <div />
+      <div />
     </div>
   );
 };
+
+export const Login = ({ message }: { message: string }): JSX.Element => {
+  return (
+    <div class="container">
+      <div class="container-title">{"Login"}</div>
+      <p>{message}</p>
+      <button>
+        <a href={"/github/login"}>{"Login with Github"}</a>
+      </button>
+    </div>
+  );
+}; // TODO implement Demo/Github login
+
+export const Welcome = ({}): JSX.Element => {
+  return (
+    <div class="container">
+      <div class="container-title">{"Welcome"}</div>
+      <button>
+        <a href="/">{"Browse random GitHub repositories"}</a>
+      </button>
+    </div>
+  );
+}; // TODO implement Demo/Github login
 
 export const Container = ({
   repository,
@@ -85,7 +131,6 @@ export const Container = ({
     default_branch,
     subscribers_count,
   } = repository;
-  console.log(repository);
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: "short",
     year: "numeric",
@@ -399,12 +444,7 @@ export const renderer = jsxRenderer(
         </head>
         <body>
           <header class="header">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/"
-              title="GitHub"
-            >
+            <a href="/login" title="PetitHub">
               <img
                 src="/static/icons/github.svg"
                 alt="GitHub"
@@ -412,11 +452,16 @@ export const renderer = jsxRenderer(
               />
             </a>
             <h1 class="title">{"PetitHub"}</h1>
-            <img
-              class="icon refresh"
-              src="/static/icons/refresh.svg"
-              onclick="window.location.reload()"
-            />
+            <div>
+              <button>
+                <a href="/github/login">{"Login"}</a>
+              </button>
+              <img
+                class="icon refresh"
+                src="/static/icons/refresh.svg"
+                onclick="window.location.reload()"
+              />
+            </div>
           </header>
           <div class="container-wrapper">{children}</div>
           <footer class="footer">
