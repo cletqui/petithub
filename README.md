@@ -31,7 +31,9 @@ npm run deploy
   - [ ] use nested renderer to render multiple components
   - [ ] use `useRequestContext` to have conditional render
   - [ ] implement Swagger with API
-  - [ ] add "Browse API" in addition to "Browse GitHub repositories"
+  - [x] add "Browse API" in addition to "Browse GitHub repositories"
+  - [ ] fix UI on `Welcome`
+  - [x] get rid of `Error`
 - [ ] Define unit tests
 - [ ] Fix interfaces and type definitions
 - [ ] Setup GitHub Actions

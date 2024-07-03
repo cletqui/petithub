@@ -1,40 +1,18 @@
-export const timeAgo = (date: Date) => {
+export const timeAgo = (date: Date): string => {
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  const interval = Math.floor(seconds / 31536000);
-  if (interval > 1) {
-    return interval + " years ago";
-  }
-  if (interval === 1) {
-    return interval + " year ago";
-  }
-  const months = Math.floor(seconds / 2628000);
-  if (months > 1) {
-    return months + " months ago";
-  }
-  if (months === 1) {
-    return months + " month ago";
-  }
-  const days = Math.floor(seconds / 86400);
-  if (days > 1) {
-    return days + " days ago";
-  }
-  if (days === 1) {
-    return days + " day ago";
-  }
-  const hours = Math.floor(seconds / 3600);
-  if (hours > 1) {
-    return hours + " hours ago";
-  }
-  if (hours === 1) {
-    return hours + " hour ago";
-  }
-  const minutes = Math.floor(seconds / 60);
-  if (minutes > 1) {
-    return minutes + " minutes ago";
-  }
-  if (minutes === 1) {
-    return minutes + " minute ago";
+  const intervals = [
+    { label: "year", seconds: 31536000 },
+    { label: "month", seconds: 2628000 },
+    { label: "day", seconds: 86400 },
+    { label: "hour", seconds: 3600 },
+    { label: "minute", seconds: 60 },
+  ];
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count > 0) {
+      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+    }
   }
   return "just now";
 };

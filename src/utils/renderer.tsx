@@ -68,6 +68,7 @@ export const RepositoryContainer = async ({
     if (status && status === 403) {
       return <Login message={message} />;
     } else {
+      console.error(status, message);
       return <Loader />;
     }
   }
@@ -82,7 +83,7 @@ export const Loader = (): JSX.Element => {
   );
 };
 
-export const Login = ({ message }: { message: string }): JSX.Element => {
+const Login = ({ message }: { message: string }): JSX.Element => {
   return (
     <div class="container">
       <div class="container-title">{"Login"}</div>
@@ -92,18 +93,22 @@ export const Login = ({ message }: { message: string }): JSX.Element => {
       </button>
     </div>
   );
-}; // TODO implement Demo/Github login
+}; // TODO fix UI
 
 export const Welcome = ({}): JSX.Element => {
   return (
     <div class="container">
-      <div class="container-title">{"Welcome"}</div>
+      <div class="container-title">{"Welcome to PetitHub"}</div>
+      <p>{"You are now connected"}</p>
       <button>
         <a href="/">{"Browse random GitHub repositories"}</a>
       </button>
+      <button>
+        <a href="/api">{"Browse API"}</a>
+      </button>
     </div>
   );
-}; // TODO implement Demo/Github login
+}; // TODO fix UI
 
 export const Container = ({
   repository,
@@ -224,7 +229,6 @@ export const Container = ({
                       src={avatar_url}
                       alt="avatar_url"
                     />
-
                     <b>{login}</b>
                   </a>
                 </td>
@@ -444,24 +448,15 @@ export const renderer = jsxRenderer(
         </head>
         <body>
           <header class="header">
-            <a href="/login" title="PetitHub">
-              <img
-                src="/static/icons/github.svg"
-                alt="GitHub"
-                class="icon github-icon"
-              />
-            </a>
+            <img
+              class="icon refresh"
+              src="/static/icons/refresh.svg"
+              onclick="window.location.reload()"
+            />
             <h1 class="title">{"PetitHub"}</h1>
-            <div>
-              <button>
-                <a href="/github/login">{"Login"}</a>
-              </button>
-              <img
-                class="icon refresh"
-                src="/static/icons/refresh.svg"
-                onclick="window.location.reload()"
-              />
-            </div>
+            <button>
+              <a href="/github/login">{"Login"}</a>
+            </button>
           </header>
           <div class="container-wrapper">{children}</div>
           <footer class="footer">

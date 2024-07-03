@@ -65,6 +65,9 @@ body {
   cursor: pointer;
   filter: var(--svg-icon-color);
 }
+.header button {
+  margin: 0 1rem;
+}
 .header .title {
   font-size: 2rem;
   font-weight: 600;

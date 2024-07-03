@@ -1,4 +1,5 @@
 import { Context, MiddlewareHandler, Next } from "hono";
+import { getCookie } from "hono/cookie";
 import { Octokit } from "@octokit/core";
 import { OctokitResponse } from "@octokit/types";
 
@@ -13,10 +14,8 @@ export const apiAuth = (): MiddlewareHandler => {
   ) {
     const { access_token } = c.var;
     const accessToken = access_token || c.req.header("Authorization");
-    if (accessToken) {
-      if (await verifyToken(accessToken, c)) {
-        await next();
-      }
+    if (accessToken && (await verifyToken(accessToken, c))) {
+      await next();
     }
     return c.text("Unauthorized", 401);
   };
@@ -137,6 +136,18 @@ export const getRandomRepository = async (
   } catch (error: any) {
     throw error;
   }
+};
+
+export const handleMaxId = (): MiddlewareHandler => {
+  return async function handleMaxId(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ) {
+    const max_id = getCookie(c, "max_id", "secure");
+    const MAX_ID = 822080279; // TODO TBU
+    c.set("max_id", max_id ? JSON.parse(max_id) : { id: MAX_ID, timestamp: 0 });
+    await next();
+  };
 };
 
 export const getMaxId = async (

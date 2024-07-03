@@ -2,7 +2,6 @@ import { Context, MiddlewareHandler, Next } from "hono";
 import { setCookie, getCookie } from "hono/cookie";
 
 import { Bindings, Variables } from "..";
-import { stateCookieOptions } from "./cookie";
 
 export const generateState = (): MiddlewareHandler => {
   return async function generateState(
@@ -10,7 +9,14 @@ export const generateState = (): MiddlewareHandler => {
     next: Next
   ) {
     const state = generateRandomString();
-    setCookie(c, "state", state, stateCookieOptions);
+    setCookie(c, "state", state, {
+      path: "/github",
+      secure: true,
+      httpOnly: true,
+      maxAge: 600,
+      sameSite: "none",
+      prefix: "secure",
+    });
     c.set("state", state);
     await next();
   };
@@ -21,9 +27,16 @@ export const handleState = (): MiddlewareHandler => {
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ) {
-    const state = getCookie(c, "state", "secure");
-    c.set("state", state);
-    await next();
+    const secret = getCookie(c, "state", "secure");
+    const { state } = c.req.query();
+    if (secret === state) {
+      await next();
+    } else {
+      console.error(
+        `State mismatched: expected ${secret} and received ${state}`
+      );
+      return c.redirect("/", 302);
+    }
   };
 };
 
