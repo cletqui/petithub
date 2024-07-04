@@ -38,11 +38,11 @@ app.get(
 app.get(
   "/callback",
   async (c: Context<{ Bindings: Bindings; Variables: Variables }>) => {
-    const { refresh_token, access_token } = c.var;
+    const { refresh_token, access_token, expires_in } = c.var;
     const searchParams = new URLSearchParams();
     refresh_token && searchParams.append("refresh_token", refresh_token);
     access_token && searchParams.append("access_token", access_token);
-    access_token && searchParams.append("expires_in", `28800`);
+    expires_in && searchParams.append("expires_in", expires_in);
     searchParams.append("callback_url", "/welcome");
     return c.redirect(`/github/access_token?${searchParams.toString()}`, 302);
   }

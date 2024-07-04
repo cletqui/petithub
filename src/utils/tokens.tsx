@@ -12,7 +12,6 @@ export const handleTokens = (): MiddlewareHandler => {
     const refreshToken = getCookie(c, "refresh_token", "secure");
     c.set("access_token", accessToken);
     c.set("refresh_token", refreshToken);
-    console.log(c.var);
     await next();
   };
 };
@@ -63,7 +62,7 @@ export const handleRefresh = (): MiddlewareHandler => {
     );
     const tokens = await response.text();
     const responseParams = new URLSearchParams(tokens);
-    return Object.fromEntries(responseParams); // TODO implement interface {error, error_description, access_token, expires_in}
+    return Object.fromEntries(responseParams); // TODO implement interface
   };
 
   return async function handleRefresh(
@@ -75,11 +74,17 @@ export const handleRefresh = (): MiddlewareHandler => {
     const {
       error,
       error_description,
+      access_token,
+      expires_in,
       refresh_token,
       refresh_token_expires_in,
     } = await fetchRefreshToken(CLIENT_ID, CLIENT_SECRET, code);
     if (refresh_token) {
       setToken(c, "refresh_token", refresh_token, refresh_token_expires_in);
+    }
+    if (access_token) {
+      c.set("access_token", access_token);
+      c.set("expires_in", expires_in || "28800");
     } else {
       console.error(error, error_description);
     }
@@ -99,7 +104,7 @@ export const handleAccess = (): MiddlewareHandler => {
     );
     const tokens = await response.text();
     const responseParams = new URLSearchParams(tokens);
-    return Object.fromEntries(responseParams); // TODO implement interface {error, error_description, access_token, expires_in}
+    return Object.fromEntries(responseParams); // TODO implement interface
   };
 
   return async function handleAccess(
@@ -109,7 +114,7 @@ export const handleAccess = (): MiddlewareHandler => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { refresh_token, access_token, expires_in } = c.req.query();
     if (access_token) {
-      setToken(c, "access_token", access_token, expires_in);
+      setToken(c, "access_token", access_token, expires_in || "28800");
     } else if (refresh_token) {
       const {
         error,
@@ -119,6 +124,7 @@ export const handleAccess = (): MiddlewareHandler => {
       } = await fetchAccessToken(CLIENT_ID, CLIENT_SECRET, refresh_token);
       if (update) {
         setToken(c, "access_token", update, expires);
+        c.set("expires_in", expires);
       } else {
         console.error(error, error_description);
         return c.redirect("/github/login", 302);

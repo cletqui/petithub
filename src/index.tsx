@@ -22,6 +22,7 @@ export type Bindings = {
 export type Variables = {
   max_id: { id: number; timestamp: number };
   access_token?: string;
+  expires_in?: string;
   refresh_token?: string;
   state: string;
 };
