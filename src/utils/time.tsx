@@ -1,3 +1,9 @@
+/**
+ * Calculates the time elapsed since a given date in a human-readable format.
+ * @function timeAgo
+ * @param {Date} date - The date to calculate the time elapsed from.
+ * @returns {string} A string representing the time elapsed in a human-readable format.
+ */
 export const timeAgo = (date: Date): string => {
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);

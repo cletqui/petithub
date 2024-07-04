@@ -1,16 +1,16 @@
 import { Context, Hono } from "hono";
 
 import { Bindings, Variables } from "..";
-import { handleTokens, refreshToken } from "../utils/tokens";
-import { getMaxId, getOctokitInstance } from "../utils/octokit";
+import { handleTokens } from "../utils/tokens";
+import { getMaxId, handleMaxId } from "../utils/octokit";
 import { setCookie } from "hono/cookie";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
-app.use(handleTokens());
-app.use(refreshToken());
+app.use(handleMaxId)
+app.use(handleTokens);
 
 /* ENDPOINTS */
 app.get(
@@ -21,8 +21,8 @@ app.get(
     const {
       max_id: { id, timestamp: old },
       access_token,
+      octokit,
     } = c.var;
-    const octokit = getOctokitInstance(c);
     const update = access_token ? await getMaxId(octokit, id) : id;
     const timestamp = access_token ? new Date().getTime() : old;
     setCookie(c, "max_id", `{ "id": ${update}, "timestamp": ${timestamp} }`, {

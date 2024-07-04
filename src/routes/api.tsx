@@ -5,25 +5,19 @@ import { cors } from "hono/cors";
 
 import { Bindings, Variables } from "..";
 import { handleMaxId } from "../utils/octokit";
-import { handleTokens, refreshToken } from "../utils/tokens";
-import {
-  apiAuth,
-  getOctokitInstance,
-  getRandomRepository,
-  getRepository,
-} from "../utils/octokit";
+import { handleTokens } from "../utils/tokens";
+import { apiAuth, getRandomRepository, getRepository } from "../utils/octokit";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
-app.use(handleMaxId());
-app.use(handleTokens());
-app.use(refreshToken());
-app.use(apiAuth());
 app.use(poweredBy());
 app.use(prettyJSON());
 app.use(cors({ origin: "*", allowMethods: ["GET"], credentials: true }));
+app.use(handleMaxId);
+app.use(handleTokens);
+app.use(apiAuth);
 
 /* ENDPOINTS */
 app.get(
@@ -38,8 +32,7 @@ app.get(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>
   ): Promise<Response> => {
-    const octokit = getOctokitInstance(c);
-    const { max_id } = c.var;
+    const { max_id, octokit } = c.var;
     try {
       const repository = await getRandomRepository(octokit, max_id.id);
       return c.json(repository);
@@ -55,7 +48,7 @@ app.get(
     c: Context<{ Bindings: Bindings; Variables: Variables }>
   ): Promise<Response> => {
     const { id } = c.req.param();
-    const octokit = getOctokitInstance(c);
+    const { octokit } = c.var;
     try {
       const repository = await getRepository(octokit, Number(id));
       const { id: repositoryId } = repository;

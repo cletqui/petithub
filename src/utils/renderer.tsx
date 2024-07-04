@@ -2,7 +2,7 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { PropsWithChildren } from "hono/jsx";
 import { JSX } from "hono/jsx/jsx-runtime";
 import { HtmlEscapedString } from "hono/utils/html";
-import { Octokit } from "@octokit/core";
+import { Octokit } from "octokit";
 
 import { getRandomRepository } from "./octokit";
 import { timeAgo } from "./time";
@@ -144,6 +144,13 @@ export const Container = ({
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
+  };
+  const constructUrl = (urlString: string, defaultUrl: string): string => {
+    try {
+      return new URL(urlString).toString();
+    } catch {
+      return defaultUrl;
+    }
   };
   return (
     <div class="container">
@@ -322,7 +329,7 @@ export const Container = ({
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href={`${new URL(homepage)}`}
+                  href={`${constructUrl(homepage, "https://github.com/")}`}
                 >
                   {homepage}
                 </a>

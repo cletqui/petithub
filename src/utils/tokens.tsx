@@ -1,44 +1,51 @@
-import { Context, MiddlewareHandler, Next } from "hono";
+import { Context, Next } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
+import { createMiddleware } from "hono/factory";
 
 import { Bindings, Variables } from "..";
-import { getCookie, setCookie } from "hono/cookie";
+import { handleOctokit } from "./octokit";
 
-export const handleTokens = (): MiddlewareHandler => {
-  return async function handleTokens(
+/**
+ * Middleware function to handle tokens, refresh access_token if needed and handle the octokit.
+ * @async @function handleTokens
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {Next} next - The callback function to proceed to the next middleware.
+ * @returns {Promise<Response | void>} A promise that resolves on refreshing access_tokens or creating the octokit.
+ */
+export const handleTokens = createMiddleware(
+  async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) {
+  ): Promise<Response | void> => {
     const accessToken = getCookie(c, "access_token", "secure");
     const refreshToken = getCookie(c, "refresh_token", "secure");
     c.set("access_token", accessToken);
     c.set("refresh_token", refreshToken);
-    await next();
-  };
-};
-
-export const refreshToken = (): MiddlewareHandler => {
-  return async function refreshToken(
-    c: Context<{ Bindings: Bindings; Variables: Variables }>,
-    next: Next
-  ) {
-    const { access_token, refresh_token } = c.var;
-    const { path } = c.req;
-    if (refresh_token && !access_token) {
+    if (refreshToken && !accessToken) {
+      const { path } = c.req;
       return c.redirect(
-        `/github/access_token?refresh_token=${refresh_token}&callback_url=${path}`,
+        `/github/access_token?refresh_token=${refreshToken}&callback_url=${path}`,
         302
       );
     }
-    await next();
-  };
-};
+    await handleOctokit(c, next);
+  }
+);
 
+/**
+ * Sets a token in the context and as a secure, HTTP-only cookie with specified attributes.
+ * @function setToken
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {keyof Variables} key - The key to set the token value in the context and cookie.
+ * @param {string} value - The value of the token to be set.
+ * @param {string} expires - The expiration time of the token in seconds.
+ */
 const setToken = (
   c: Context<{ Bindings: Bindings; Variables: Variables }>,
   key: keyof Variables,
   value: string,
   expires: string
-) => {
+): void => {
   c.set(key, value);
   setCookie(c, key, value, {
     path: "/",
@@ -50,25 +57,40 @@ const setToken = (
   });
 };
 
-export const handleRefresh = (): MiddlewareHandler => {
-  const fetchRefreshToken = async (
-    clientId: string,
-    clientSecret: string,
-    code: string
-  ) => {
-    const response = await fetch(
-      `https://github.com/login/oauth/access_token?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`,
-      { method: "POST" }
-    );
-    const tokens = await response.text();
-    const responseParams = new URLSearchParams(tokens);
-    return Object.fromEntries(responseParams); // TODO implement interface
-  };
+/**
+ * Asynchronously fetches a refresh token using a code.
+ * @async @function fetchRefreshToken
+ * @param {string} clientId The GitHub App client ID.
+ * @param {string} clientSecret The GitHub App client secret.
+ * @param {string} code The code for authentication.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the refresh token information.
+ */
+const fetchRefreshToken = async (
+  clientId: string,
+  clientSecret: string,
+  code: string
+): Promise<any> => {
+  const response = await fetch(
+    `https://github.com/login/oauth/access_token?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`,
+    { method: "POST" }
+  );
+  const tokens = await response.text();
+  const responseParams = new URLSearchParams(tokens);
+  return Object.fromEntries(responseParams); // TODO implement interface (any)
+};
 
-  return async function handleRefresh(
+/**
+ * Middleware function to handle token refresh by fetching new tokens.
+ * @async @function handleRefresh
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {Next} next - The callback function to proceed to the next middleware.
+ * @returns {Promise<void>} A promise that resolves after handling token refresh.
+ */
+export const handleRefresh = createMiddleware(
+  async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) {
+  ) => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { code } = c.req.query();
     const {
@@ -89,28 +111,43 @@ export const handleRefresh = (): MiddlewareHandler => {
       console.error(error, error_description);
     }
     await next();
-  };
+  }
+);
+
+/**
+ * Asynchronously fetches an access token using a refresh token.
+ * @async @function fetchAccessToken
+ * @param {string} clientId The GitHub App client ID.
+ * @param {string} clientSecret The GitHub App client secret.
+ * @param {string} refreshToken The refresh token to refresh.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the access token information.
+ */
+const fetchAccessToken = async (
+  clientId: string,
+  clientSecret: string,
+  refreshToken: string
+): Promise<any> => {
+  const response = await fetch(
+    `https://github.com/login/oauth/access_token?client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`,
+    { method: "POST" }
+  );
+  const tokens = await response.text();
+  const responseParams = new URLSearchParams(tokens);
+  return Object.fromEntries(responseParams); // TODO implement interface (any)
 };
 
-export const handleAccess = (): MiddlewareHandler => {
-  const fetchAccessToken = async (
-    clientId: string,
-    clientSecret: string,
-    refreshToken: string
-  ) => {
-    const response = await fetch(
-      `https://github.com/login/oauth/access_token?client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`,
-      { method: "POST" }
-    );
-    const tokens = await response.text();
-    const responseParams = new URLSearchParams(tokens);
-    return Object.fromEntries(responseParams); // TODO implement interface
-  };
-
-  return async function handleAccess(
+/**
+ * Middleware function to handle access tokens based on the presence of access_token or refresh_token in the request query.
+ * @async @function handleAccess
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {Next} next - The callback function to proceed to the next middleware.
+ * @returns {Promise<void>} A promise that resolves after handling access tokens and potentially redirecting.
+ */
+export const handleAccess = createMiddleware(
+  async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) {
+  ) => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { refresh_token, access_token, expires_in } = c.req.query();
     if (access_token) {
@@ -131,5 +168,5 @@ export const handleAccess = (): MiddlewareHandler => {
       }
     }
     await next();
-  };
-};
+  }
+);

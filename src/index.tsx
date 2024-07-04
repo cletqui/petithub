@@ -1,10 +1,11 @@
 import { Context, Hono } from "hono";
 import { Suspense } from "hono/jsx";
 import { logger } from "hono/logger";
+import { Octokit } from "octokit";
 
 import { renderer, Loader, RepositoryContainer } from "./utils/renderer";
-import { getOctokitInstance, handleMaxId } from "./utils/octokit";
-import { handleTokens, refreshToken } from "./utils/tokens";
+import { handleMaxId } from "./utils/octokit";
+import { handleTokens } from "./utils/tokens";
 
 import api from "./routes/api";
 import github from "./routes/github";
@@ -25,6 +26,7 @@ export type Variables = {
   expires_in?: string;
   refresh_token?: string;
   state: string;
+  octokit: Octokit;
 };
 
 /* APP */
@@ -33,9 +35,8 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 /* MIDDLEWARES */
 app.use(logger());
 app.use(renderer);
-app.use("/", handleMaxId());
-app.use("/", handleTokens());
-app.use("/", refreshToken());
+app.use("/", handleMaxId);
+app.use("/", handleTokens);
 
 /* ROUTES */
 app.route("/api", api);
@@ -50,8 +51,7 @@ app.get(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>
   ): Promise<Response> => {
-    const octokit = getOctokitInstance(c);
-    const { max_id } = c.var;
+    const { max_id, octokit } = c.var;
     return c.render(
       <Suspense fallback={<Loader />}>
         <RepositoryContainer octokit={octokit} maxId={max_id.id} />

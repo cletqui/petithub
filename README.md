@@ -16,6 +16,7 @@ npm run deploy
 ## TODO
 
 - [ ] Write `README.md`
+- [ ] Write GitHub App description
 - [ ] Improve GUI
   - [x] add additional info about the repo
   - [x] implement dark/light themes

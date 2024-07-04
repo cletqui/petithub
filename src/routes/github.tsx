@@ -2,16 +2,15 @@ import { Context, Hono } from "hono";
 
 import { Bindings, Variables } from "..";
 import { generateState, handleState } from "../utils/state";
-import { handleAccess, handleRefresh } from "../utils/tokens";
+import { handleAccess } from "../utils/tokens";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
-app.use("/login", generateState());
-app.use("/callback", handleState());
-app.use("/callback", handleRefresh());
-app.use("/access_token", handleAccess());
+app.use("/login", generateState);
+app.use("/callback", handleState);
+app.use("/access_token", handleAccess);
 
 /* ENDPOINTS */
 app.get(
