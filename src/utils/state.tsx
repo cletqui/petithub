@@ -17,7 +17,6 @@ export const generateState = createMiddleware(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ) => {
-    console.log("MIDDLEWARE", "generateState");
     const state = generateRandomString();
     setCookie(c, "state", state, {
       path: "/github",
@@ -44,7 +43,6 @@ export const handleState = createMiddleware(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ): Promise<Response | void> => {
-    console.log("MIDDLEWARE", "handleState");
     const secret = getCookie(c, "state", "secure");
     const { state } = c.req.query();
     if (secret === state) {

@@ -45,10 +45,6 @@ npm run deploy
   - [x] Cloudflare
   - [ ] GitHub
   - [ ] Heroku
-- [ ] Implement fine-grained tokens for GitHub apps (instead of global access_token)
-- [ ] Use middlewares
-  - [ ] to declare the octokit instance
-  - [x] to add auth header if access_token is valid (to allow API use when `access_token` is defined)
 - [x] fix API by adding 404 not found if no repo by id is found
 - [x] Add icons in footer
 - [x] Find `MAX_ID` dynamically and store in Cookies
@@ -65,3 +61,6 @@ npm run deploy
   - [x] change GitHub App icon
   - [x] handle `state` verification
   - [x] handle `access_token` refresh with `refresh_token`
+- [x] Use middlewares
+  - [x] to declare the octokit instance
+  - [x] to add auth header if access_token is valid (to allow API use when `access_token` is defined)

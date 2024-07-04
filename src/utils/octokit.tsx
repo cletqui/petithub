@@ -39,7 +39,6 @@ export const apiAuth = createMiddleware(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ) => {
-    console.log("MIDDLEWARE", "apiAuth");
     const { access_token } = c.var;
     const accessToken = access_token || c.req.header("Authorization");
     if (accessToken && (await verifyToken(accessToken, c))) {
@@ -61,7 +60,6 @@ export const handleOctokit = createMiddleware(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ) => {
-    console.log("MIDDLEWARE", "handleOctokit");
     const octokit = getOctokitInstance(c);
     c.set("octokit", octokit);
     await next();
