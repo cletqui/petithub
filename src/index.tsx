@@ -3,7 +3,8 @@ import { Suspense } from "hono/jsx";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 
-import { renderer, Loader, RepositoryContainer } from "./utils/renderer";
+import { renderer, RepositoryContainer } from "./utils/renderer";
+import { Loader } from "./components/loader";
 import { handleMaxId } from "./utils/octokit";
 import { handleTokens } from "./utils/tokens";
 

@@ -3,7 +3,8 @@ import { Suspense } from "hono/jsx";
 
 import { Bindings, Variables } from "..";
 import { handleTokens } from "../utils/tokens";
-import { Loader, Container } from "../utils/renderer";
+import { Loader } from "../components/loader";
+import { Container } from "../utils/renderer";
 import { getRepos } from "../utils/octokit";
 
 /* APP */

@@ -4,6 +4,8 @@ import { JSX } from "hono/jsx/jsx-runtime";
 import { HtmlEscapedString } from "hono/utils/html";
 import { Octokit } from "octokit";
 
+import { Loader } from "../components/loader";
+import { Login } from "../components/landing";
 import { getRandomRepository } from "./octokit";
 import { timeAgo } from "./time";
 
@@ -65,7 +67,7 @@ export const RepositoryContainer = async ({
         data: { message },
       },
     } = (error as OctokitErrorResponse) || {};
-    if (status && status === 403) {
+    if (status && status === 403) { // TODO https://docs.github.com/en/rest/guides/scripting-with-the-rest-api-and-javascript?apiVersion=2022-11-28#handling-rate-limit-errors
       return <Login message={message} />;
     } else {
       console.error(status, message);
@@ -73,42 +75,6 @@ export const RepositoryContainer = async ({
     }
   }
 };
-
-export const Loader = (): JSX.Element => {
-  return (
-    <div class="lds-ripple">
-      <div />
-      <div />
-    </div>
-  );
-};
-
-const Login = ({ message }: { message: string }): JSX.Element => {
-  return (
-    <div class="container">
-      <div class="container-title">{"Login"}</div>
-      <p>{message}</p>
-      <button>
-        <a href={"/github/login"}>{"Login with Github"}</a>
-      </button>
-    </div>
-  );
-}; // TODO fix UI
-
-export const Welcome = ({}): JSX.Element => {
-  return (
-    <div class="container">
-      <div class="container-title">{"Welcome to PetitHub"}</div>
-      <p>{"You are now connected"}</p>
-      <button>
-        <a href="/">{"Browse random GitHub repositories"}</a>
-      </button>
-      <button>
-        <a href="/api">{"Browse API"}</a>
-      </button>
-    </div>
-  );
-}; // TODO fix UI
 
 export const Container = ({
   repository,

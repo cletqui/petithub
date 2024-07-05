@@ -34,6 +34,8 @@ npm run deploy
   - [ ] implement Swagger with API
   - [x] add "Browse API" in addition to "Browse GitHub repositories"
   - [ ] fix UI on `Welcome`
+  - [ ] add profile name + icon when connected
+  - [ ] allow starring repo when connected
 - [ ] Redirect to "/:id" from "/" and check by referrer (redirect to "/" if referrer is not "/" or if repository is not PetitHub friendly)
 - [ ] Define unit tests
 - [ ] Fix interfaces and type definitions

@@ -2,9 +2,9 @@ import { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { Octokit } from "octokit";
-import { OctokitResponse } from "@octokit/types";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
-import { Repository } from "./renderer";
+import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
 
 /**
@@ -32,13 +32,13 @@ const verifyToken = async (
  * @async @function apiAuth
  * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
- * @returns {Promise<void>} A promise that resolves after authenticating the request or returning an unauthorized response.
+ * @returns {Promise<void | Response>} A promise that resolves after authenticating the request or returning an unauthorized response.
  */
 export const apiAuth = createMiddleware(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) => {
+  ): Promise<void | Response> => {
     const { access_token } = c.var;
     const accessToken = access_token || c.req.header("Authorization");
     if (accessToken && (await verifyToken(accessToken, c))) {
@@ -59,7 +59,7 @@ export const handleOctokit = createMiddleware(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) => {
+  ): Promise<void> => {
     const octokit = getOctokitInstance(c);
     c.set("octokit", octokit);
     await next();
@@ -85,6 +85,7 @@ const getOctokitInstance = (
       accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
     },
+    userAgent: `PetitHub/${version}`,
   });
 };
 
@@ -93,14 +94,14 @@ const getOctokitInstance = (
  * @async @function getRepositories
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} since - The ID to start fetching repositories from.
- * @returns {Promise<OctokitResponse<Repository[]>>} A promise that resolves to the response containing an array of repositories.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]>} A promise that resolves to the response containing an array of repositories.
  */
 const getRepositories = async (
   octokit: Octokit,
   since: number
-): Promise<OctokitResponse<Repository[]>> => {
+): Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]> => {
   try {
-    return await octokit.request("GET /repositories", { since });
+    return await octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
   } catch (error: any) {
     throw error;
   }
@@ -112,15 +113,15 @@ const getRepositories = async (
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {string} owner - The owner of the repository.
  * @param {string} repo - The name of the repository.
- * @returns {Promise<OctokitResponse<any>>} A promise that resolves to the response containing the repository information.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["get"]["response"]>} A promise that resolves to the response containing the repository information.
  */
 export const getRepos = async (
   octokit: Octokit,
   owner: string,
   repo: string
-): Promise<OctokitResponse<any>> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]> => {
   try {
-    return await octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
+    return await octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
     throw error;
   }
@@ -136,7 +137,7 @@ export const getRepos = async (
 export const getRepository = async (
   octokit: Octokit,
   id: number
-): Promise<Repository> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
   try {
     const { data, status, url } = await getRepositories(
       octokit,
@@ -172,15 +173,13 @@ export const getRepository = async (
 export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
-): Promise<Repository> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
   try {
     const maxIterations = 10; // max iterations
     for (let loop = 0; loop < maxIterations; loop++) {
       const since = Math.floor(Math.random() * maxId);
       const { data: repositories } = await getRepositories(octokit, since);
-      const originalRepositories = repositories.filter(
-        (repo: Repository) => !repo.fork
-      );
+      const originalRepositories = repositories.filter((repo) => !repo.fork);
       for (const repo of originalRepositories) {
         const {
           name,

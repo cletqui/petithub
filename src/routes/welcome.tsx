@@ -1,7 +1,7 @@
 import { Context, Hono } from "hono";
 
 import { Bindings, Variables } from "..";
-import { Welcome } from "../utils/renderer";
+import { Welcome } from "../components/landing";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
