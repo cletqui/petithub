@@ -1,9 +1,10 @@
-import app from "..";
-import { verifyToken } from "./__mocks__/octokit";
+import { describe, test, expect } from "vitest";
+
+import app from ".";
 
 const MOCK_ENV = {
   octokit: {},
-  verifyToken,
+
 };
 
 describe("Testing API", () => {
