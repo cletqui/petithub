@@ -9,7 +9,6 @@ import { handleTokens } from "./utils/tokens";
 
 import api from "./routes/api";
 import github from "./routes/github";
-import welcome from "./routes/welcome";
 import template from "./routes/template";
 import id from "./routes/id";
 
@@ -41,7 +40,6 @@ app.use("/", handleTokens);
 /* ROUTES */
 app.route("/api", api);
 app.route("/github", github);
-app.route("/welcome", welcome);
 app.route("/template", template);
 app.route("/id", id);
 

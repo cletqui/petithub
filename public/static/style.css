@@ -97,6 +97,9 @@ body {
     transform: rotate(360deg);
   }
 }
+.header button .icon {
+  margin: 0;
+}
 
 /* CONTAINER */
 /* Title */
@@ -346,6 +349,9 @@ a:hover {
   }
 }
 @media (max-width: 800px) {
+  html {
+    font-size: small !important;
+  }
   .layout-main-header {
     display: inline-block;
   }
@@ -355,7 +361,7 @@ a:hover {
 }
 @media (max-width: 600px) {
   html {
-    font-size: small;
+    font-size: smaller !important;
   }
   .container-layout {
     flex-direction: column-reverse;

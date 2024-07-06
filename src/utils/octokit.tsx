@@ -21,7 +21,7 @@ const verifyToken = async (
   try {
     const { status } = await getRepos(octokit, "octocat", "Hello-World");
     return status === 200;
-  } catch (error) {
+  } catch (_) {
     return false;
   }
 };
@@ -100,7 +100,7 @@ const getRepositories = async (
   since: number
 ): Promise<RepositoriesResponse> => {
   try {
-    return await octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
+    return octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
   } catch (error: any) {
     throw error;
   }
@@ -120,7 +120,7 @@ export const getRepos = async (
   repo: string
 ): Promise<RepositoryResponse> => {
   try {
-    return await octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
+    return octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
     throw error;
   }
@@ -231,7 +231,7 @@ export const getAuthenticatedUser = async (
   octokit: Octokit
 ): Promise<UserResponse> => {
   try {
-    return await octokit.rest.users.getAuthenticated(); // octokit.request("GET /user");
+    return octokit.rest.users.getAuthenticated(); // octokit.request("GET /user");
   } catch (error: any) {
     throw error;
   }

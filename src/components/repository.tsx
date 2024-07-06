@@ -1,4 +1,5 @@
 import { JSX } from "hono/jsx/jsx-runtime";
+import { Suspense } from "hono/jsx";
 
 import { timeAgo } from "../utils/time";
 import { constructUrl } from "../utils/url";
@@ -8,7 +9,11 @@ export const Repository = async ({
 }: {
   repository: Promise<Repository>;
 }) => {
-  return <Container repository={await repository} />;
+  return (
+    <Suspense fallback={<div>{"prout"}</div>}>
+      <Container repository={await repository} />
+    </Suspense>
+  );
 }; // TODO handle errors like https://docs.github.com/en/rest/guides/scripting-with-the-rest-api-and-javascript?apiVersion=2022-11-28#handling-rate-limit-errors
 
 const Container = ({ repository }: { repository: Repository }): JSX.Element => {
