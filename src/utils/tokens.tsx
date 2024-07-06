@@ -1,5 +1,5 @@
 import { Context, Next } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 
 import { Bindings, Variables } from "..";
@@ -52,7 +52,21 @@ const setToken = (
     secure: true,
     httpOnly: true,
     maxAge: Number(expires),
-    sameSite: "Strict",
+    sameSite: "Lax", // Strict
+    prefix: "secure",
+  });
+};
+
+export const unsetToken = (
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
+  key: keyof Variables
+) => {
+  c.set(key, undefined);
+  deleteCookie(c, key, {
+    path: "/",
+    secure: true,
+    httpOnly: true,
+    sameSite: "Lax", // Strict
     prefix: "secure",
   });
 };
@@ -167,6 +181,24 @@ export const handleAccess = createMiddleware(
         return c.redirect("/github/login", 302);
       }
     }
+    await next();
+  }
+);
+
+/**
+ * Middleware function to handle user logout by unsetting refresh and access tokens.
+ * @async @function handleLogout
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {Next} next - The callback function to proceed to the next middleware.
+ * @returns {Promise<void>} A promise that resolves after handling access tokens.
+ */
+export const handleLogout = createMiddleware(
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<void> => {
+    unsetToken(c, "refresh_token");
+    unsetToken(c, "access_token");
     await next();
   }
 );

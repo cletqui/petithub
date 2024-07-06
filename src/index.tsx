@@ -1,11 +1,10 @@
 import { Context, Hono } from "hono";
-import { Suspense } from "hono/jsx";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 
-import { renderer, RepositoryContainer } from "./utils/renderer";
-import { Loader } from "./components/loader";
-import { handleMaxId } from "./utils/octokit";
+import { renderer } from "./utils/renderer";
+import { Repository } from "./components/repository";
+import { getRandomRepository, handleMaxId } from "./utils/octokit";
 import { handleTokens } from "./utils/tokens";
 
 import api from "./routes/api";
@@ -53,18 +52,17 @@ app.get(
     c: Context<{ Bindings: Bindings; Variables: Variables }>
   ): Promise<Response> => {
     const { max_id, octokit } = c.var;
-    return c.render(
-      <Suspense fallback={<Loader />}>
-        <RepositoryContainer octokit={octokit} maxId={max_id.id} />
-      </Suspense>,
-      { title: "PetitHub" } // TODO change this title dynamically
-    );
+    const repository = getRandomRepository(octokit, max_id.id);
+    return c.render(<Repository repository={repository} />, { repository });
   }
 );
 
 /* DEFAULT */
-app.get("*", (c) => {
-  return c.redirect("/", 301);
-});
+app.get(
+  "*",
+  (c: Context<{ Bindings: Bindings; Variables: Variables }>): Response => {
+    return c.redirect("/", 301);
+  }
+);
 
 export default app;

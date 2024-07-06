@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 
 import { Bindings, Variables } from "..";
 import { generateState, handleState } from "../utils/state";
-import { handleAccess } from "../utils/tokens";
+import { handleAccess, handleLogout } from "../utils/tokens";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -11,6 +11,7 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use("/login", generateState);
 app.use("/callback", handleState);
 app.use("/access_token", handleAccess);
+app.use("/logout", handleLogout);
 
 /* ENDPOINTS */
 app.get(
@@ -42,7 +43,7 @@ app.get(
     refresh_token && searchParams.append("refresh_token", refresh_token);
     access_token && searchParams.append("access_token", access_token);
     expires_in && searchParams.append("expires_in", expires_in);
-    searchParams.append("callback_url", "/welcome");
+    searchParams.append("callback_url", "/");
     return c.redirect(`/github/access_token?${searchParams.toString()}`, 302);
   }
 );
@@ -51,7 +52,15 @@ app.get(
   "/access_token",
   async (c: Context<{ Bindings: Bindings; Variables: Variables }>) => {
     const { callback_url } = c.req.query();
-    return c.redirect(callback_url || "/welcome", 302);
+    return c.redirect(callback_url || "/", 302);
+  }
+);
+
+app.get(
+  "/logout",
+  async (c: Context<{ Bindings: Bindings; Variables: Variables }>) => {
+    const { callback_url } = c.req.query();
+    return c.redirect(callback_url || "/", 302);
   }
 );
 

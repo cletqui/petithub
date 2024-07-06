@@ -2,7 +2,6 @@ import { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { Octokit } from "octokit";
-import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
@@ -73,7 +72,7 @@ export const handleOctokit = createMiddleware(
  * @param {string} [token] - Optional token for authentication.
  * @returns {Octokit} An instance of Octokit.
  */
-const getOctokitInstance = (
+export const getOctokitInstance = (
   c: Context<{ Bindings: Bindings; Variables: Variables }>,
   token?: string
 ): Octokit => {
@@ -94,12 +93,12 @@ const getOctokitInstance = (
  * @async @function getRepositories
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} since - The ID to start fetching repositories from.
- * @returns {Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]>} A promise that resolves to the response containing an array of repositories.
+ * @returns {Promise<RepositoriesResponse>} A promise that resolves to the response containing an array of repositories.
  */
 const getRepositories = async (
   octokit: Octokit,
   since: number
-): Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]> => {
+): Promise<RepositoriesResponse> => {
   try {
     return await octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
   } catch (error: any) {
@@ -113,13 +112,13 @@ const getRepositories = async (
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {string} owner - The owner of the repository.
  * @param {string} repo - The name of the repository.
- * @returns {Promise<RestEndpointMethodTypes["repos"]["get"]["response"]>} A promise that resolves to the response containing the repository information.
+ * @returns {Promise<>} A promise that resolves to the response containing the repository information.
  */
 export const getRepos = async (
   octokit: Octokit,
   owner: string,
   repo: string
-): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]> => {
+): Promise<RepositoryResponse> => {
   try {
     return await octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
@@ -137,7 +136,7 @@ export const getRepos = async (
 export const getRepository = async (
   octokit: Octokit,
   id: number
-): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
+): Promise<Repository> => {
   try {
     const { data, status, url } = await getRepositories(
       octokit,
@@ -173,7 +172,7 @@ export const getRepository = async (
 export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
-): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
+): Promise<Repository> => {
   try {
     const maxIterations = 10; // max iterations
     for (let loop = 0; loop < maxIterations; loop++) {
@@ -200,6 +199,39 @@ export const getRandomRepository = async (
       }
     }
     throw new Error(`No repository found with ${maxIterations} iterations`);
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+/**
+ * Asynchronously fetches a specific property value from the repository data.
+ * @async @function fetchRepositoryData
+ * @template T - The type of the repository data (Repository).
+ * @template K - The type of the key to extract from the repository data.
+ * @param {Promise<T>} repository - The Promise containing the repository data.
+ * @param {K} key - The key to extract from the repository data.
+ * @returns {Promise<T[K]>} A Promise that resolves with the extracted property value.
+ */
+export const fetchRepositoryData = async <T, K extends keyof T>(
+  repository: Promise<T>,
+  key: K
+): Promise<T[K]> => {
+  const repo = await repository;
+  return repo[key];
+};
+
+/**
+ * Asynchronously retrieves the authenticated user's information using the provided Octokit instance.
+ * @async @function getAuthenticatedUser
+ * @param {Octokit} octokit - The Octokit instance for GitHub API.
+ * @returns {Promise<UserResponse>} A Promise that resolves to the user's information response.
+ */
+export const getAuthenticatedUser = async (
+  octokit: Octokit
+): Promise<UserResponse> => {
+  try {
+    return await octokit.rest.users.getAuthenticated(); // octokit.request("GET /user");
   } catch (error: any) {
     throw error;
   }

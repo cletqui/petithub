@@ -1,11 +1,9 @@
 import { Context, Hono } from "hono";
-import { Suspense } from "hono/jsx";
 
 import { Bindings, Variables } from "..";
+import { Repository } from "../components/repository";
 import { handleTokens } from "../utils/tokens";
-import { Loader } from "../components/loader";
-import { Container } from "../utils/renderer";
-import { getRepos } from "../utils/octokit";
+import { getRepository } from "../utils/octokit";
 
 /* APP */
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -20,15 +18,9 @@ app.get(
     c: Context<{ Bindings: Bindings; Variables: Variables }>
   ): Promise<Response> => {
     const { octokit } = c.var;
-    const owner = "cletqui";
-    const repo = "petithub";
-    const { data: repository } = await getRepos(octokit, owner, repo);
-    return c.render(
-      <Suspense fallback={<Loader />}>
-        <Container repository={repository} />
-      </Suspense>,
-      { title: `PetitHub - ${owner}/${repo}` }
-    );
+    const id = 811042081; // cletqui/petithub
+    const repository = getRepository(octokit, id);
+    return c.render(<Repository repository={repository} />, { repository });
   }
 );
 
