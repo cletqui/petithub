@@ -1,6 +1,8 @@
 # PetitHub 🌌
 
-Explore the hidden gems of GitHub with [PetitHub](https://github.com/cletqui/petithub/)! This project is an adaptation of the [Petit Tube](https://en.wikipedia.org/wiki/Petit_Tube) concept to GitHub: it allows users to discover random, obscure GitHub repositories that have no stars. Whether you're looking to find an undiscovered masterpiece or just satisfy your curiosity, PetitHub is here to take you on a journey through the lesser-known corners of GitHub.
+Explore the hidden gems of GitHub with [PetitHub](https://github.com/cletqui/petithub/)! 
+
+This project is an adaptation of the [Petit Tube](https://en.wikipedia.org/wiki/Petit_Tube) concept to GitHub: it allows users to discover random, obscure GitHub repositories that have no stars. Whether you're looking to find an undiscovered masterpiece or just satisfy your curiosity, PetitHub is here to take you on a journey through the lesser-known corners of GitHub.
 
 ![PetitHub Screenshot](.github/screenshot.png)
 
