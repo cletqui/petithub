@@ -32,7 +32,7 @@ npm run deploy
   - [x] use nested renderer to render multiple components
   - [x] use `useRequestContext` to have conditional render
   - [ ] implement Swagger with API
-  - [ ] add profile name + icon when connected + fix UI
+  - [x] add profile name + icon when connected + fix UI
   - [x] add possibility to logout
   - [ ] allow starring repo when connected
 - [ ] Define unit tests
