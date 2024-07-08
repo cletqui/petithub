@@ -17,9 +17,8 @@ const User = async ({ user }: { user: Promise<UserResponse> }) => {
   try {
     const c = useRequestContext();
     const { path } = c.req;
-    const {
-      data: { login, avatar_url },
-    } = await user;
+    const { data } = await user;
+    const { login, avatar_url } = data;
     return (
       <button class="button" onclick="logout">
         <a href={`/github/logout?callback_url=${path}`}>

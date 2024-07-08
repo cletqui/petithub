@@ -131,12 +131,12 @@ export const getRepos = async (
  * @async @function getRepository
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} id - The ID of the repository to retrieve.
- * @returns {Promise<Repository>} A promise that resolves to the requested repository.
+ * @returns {Promise<RepositoryResponse["data"]>} A promise that resolves to the requested repository.
  */
 export const getRepository = async (
   octokit: Octokit,
   id: number
-): Promise<Repository> => {
+): Promise<RepositoryResponse["data"]> => {
   try {
     const { data, status, url } = await getRepositories(
       octokit,
@@ -167,12 +167,12 @@ export const getRepository = async (
  * @async @function getRandomRepository
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} maxId - The maximum ID to consider for repository selection.
- * @returns {Promise<Repository>} A promise that resolves to the selected repository.
+ * @returns {Promise<RepositoryResponse["data"]>} A promise that resolves to the selected repository.
  */
 export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
-): Promise<Repository> => {
+): Promise<RepositoryResponse["data"]> => {
   try {
     const maxIterations = 10; // max iterations
     for (let loop = 0; loop < maxIterations; loop++) {
