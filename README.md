@@ -19,7 +19,7 @@ This project is an adaptation of the [Petit Tube](https://en.wikipedia.org/wiki/
   - [Table of Contents 📋](#table-of-contents-)
   - [Features ✨](#features-)
   - [How It Works 🔍](#how-it-works-)
-  - [Endpoints](#endpoints)
+  - [Endpoints 📑](#endpoints-)
     - [Main Page](#main-page)
     - [Custom API](#custom-api)
   - [Getting Started 🚀](#getting-started-)
@@ -52,7 +52,7 @@ PetitHub uses the Octokit package to interact with the GitHub API. It browses th
 
 PetitHub is built with [Hono](https://hono.dev/) over a Vite server for a fast user and easy developer experience. It fully integrates most of the features from Hono.
 
-## Endpoints
+## Endpoints 📑
 
 ### Main Page
 
