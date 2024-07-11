@@ -2,6 +2,7 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { PropsWithChildren, Suspense } from "hono/jsx";
 import { JSX } from "hono/jsx/jsx-runtime";
 import { useRequestContext } from "hono/jsx-renderer";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { fetchRepositoryData } from "./octokit";
 import { Loader } from "../components/loader";
@@ -10,7 +11,9 @@ import { Login } from "../components/login";
 const Head = ({
   repository,
 }: {
-  repository: Promise<RepositoryResponse["data"]>;
+  repository: Promise<
+    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
+  >;
 }) => {
   const full_name = fetchRepositoryData(repository, "full_name");
   return (

@@ -28,13 +28,13 @@ app.use(handleTokens);
 app.use(apiAuth);
 
 /* SWAGGER */
-app.doc("/swagger/json", swaggerDoc);
-app.get("/swagger", swaggerUI({ url: `/api/swagger/json`, version: "3.1" }));
+app.doc("/swagger.json", swaggerDoc);
+app.get("/swagger", swaggerUI({ url: `/api/swagger.json`, version: "3.1" }));
 
 /* ROUTES */
 const route = createRoute({
   method: "get",
-  path: "/{id}",
+  path: "/{id}?",
   request: {
     params: ParamsSchema,
   },

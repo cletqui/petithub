@@ -1,5 +1,6 @@
 import { JSX } from "hono/jsx/jsx-runtime";
 import { Suspense } from "hono/jsx";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { timeAgo, dateOptions } from "../utils/time";
 import { constructUrl } from "../utils/url";
@@ -7,7 +8,9 @@ import { constructUrl } from "../utils/url";
 export const Repository = async ({
   repository,
 }: {
-  repository: Promise<RepositoryResponse["data"]>;
+  repository: Promise<
+    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
+  >;
 }) => {
   return (
     <Suspense fallback={<div>{"prout"}</div>}>
@@ -19,7 +22,7 @@ export const Repository = async ({
 const Container = ({
   repository,
 }: {
-  repository: RepositoryResponse["data"];
+  repository: RestEndpointMethodTypes["repos"]["get"]["response"]["data"];
 }): JSX.Element => {
   const {
     id,
