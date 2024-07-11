@@ -1,20 +1,21 @@
-import { Context, Next, Env } from "hono";
+import { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { Octokit } from "octokit";
 
 import { version } from "../../package.json";
+import { Bindings, Variables } from "..";
 
 /**
  * Asynchronously verifies the token by checking the status of fetching repositories.
  * @async @function verifyToken
  * @param {string} token The token to verify.
- * @param {Context<Env>} c The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c The Context object.
  * @returns {Promise<boolean>} A promise that resolves to true if the token is valid, false otherwise.
  */
 const verifyToken = async (
   token: string,
-  c: Context<Env>
+  c: Context<{ Bindings: Bindings; Variables: Variables }>
 ): Promise<boolean> => {
   const octokit = getOctokitInstance(c, token);
   try {
@@ -28,12 +29,15 @@ const verifyToken = async (
 /**
  * Middleware function to authenticate API requests using an access token.
  * @async @function apiAuth
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void | Response>} A promise that resolves after authenticating the request or returning an unauthorized response.
  */
 export const apiAuth = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<void | Response> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<void | Response> => {
     const { access_token } = c.var;
     const accessToken = access_token || c.req.header("Authorization");
     if (accessToken && (await verifyToken(accessToken, c))) {
@@ -46,12 +50,15 @@ export const apiAuth = createMiddleware(
 /**
  * Middleware function to handle the creation of an Octokit instance and set it in the context.
  * @async @function handleOctokit
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void>} A promise that resolves after creating the Octokit instance.
  */
 export const handleOctokit = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<void> => {
     const octokit = getOctokitInstance(c);
     c.set("octokit", octokit);
     await next();
@@ -61,12 +68,12 @@ export const handleOctokit = createMiddleware(
 /**
  * Creates and returns an instance of Octokit for GitHub API.
  * @async @function getOctokitInstance
- * @param {Context<Env>} c - The context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The context object.
  * @param {string} [token] - Optional token for authentication.
  * @returns {Octokit} An instance of Octokit.
  */
 export const getOctokitInstance = (
-  c: Context<Env>,
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
   token?: string
 ): Octokit => {
   const { access_token } = c.var;
@@ -233,12 +240,15 @@ export const getAuthenticatedUser = async (
 /**
  * Middleware function to handle the maximum ID by setting it based on a cookie value or a default value.
  * @async @function handleMaxId
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void>} A promise that resolves after handling the maximum ID.
  */
 export const handleMaxId = createMiddleware(
-  async (c: Context<Env>, next: Next) => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ) => {
     const max_id = getCookie(c, "max_id", "secure");
     const MAX_ID = 822080279; // TODO TBU
     c.set("max_id", max_id ? JSON.parse(max_id) : { id: MAX_ID, timestamp: 0 });

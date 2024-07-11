@@ -1,10 +1,11 @@
-import { Context, Env } from "hono";
+import { Context } from "hono";
 import { poweredBy } from "hono/powered-by";
 import { prettyJSON } from "hono/pretty-json";
 import { cors } from "hono/cors";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
+import { Bindings, Variables } from "..";
 import {
   ErrorSchema,
   ParamsSchema,
@@ -16,7 +17,7 @@ import { handleTokens } from "../utils/tokens";
 import { apiAuth, getRandomRepository, getRepository } from "../utils/octokit";
 
 /* APP */
-const app = new OpenAPIHono<Env>();
+const app = new OpenAPIHono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
 app.use(poweredBy());
@@ -86,16 +87,19 @@ const route = createRoute({
   }
 ); */
 
-app.openapi(route, async (c: Context<Env>) => {
-  const { id } = c.req.param();
-  console.log("ID:", id);
-  const { max_id, octokit } = c.var;
-  try {
-    const repository = await getRandomRepository(octokit, max_id.id);
-    return c.json(repository, 200);
-  } catch (error: any) {
-    return c.json({ error: "Failed to fetch repository data" }, 500);
+app.openapi(
+  route,
+  async (c: Context<{ Bindings: Bindings; Variables: Variables }>) => {
+    const { id } = c.req.param();
+    console.log("ID:", id);
+    const { max_id, octokit } = c.var;
+    try {
+      const repository = await getRandomRepository(octokit, max_id.id);
+      return c.json(repository, 200);
+    } catch (error: any) {
+      return c.json({ error: "Failed to fetch repository data" }, 500);
+    }
   }
-});
+);
 
 export default app;

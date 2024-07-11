@@ -1,18 +1,22 @@
-import { Context, Next, Env, Variables } from "hono";
+import { Context, Next } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 
+import { Bindings, Variables } from "..";
 import { handleOctokit } from "./octokit";
 
 /**
  * Middleware function to handle tokens, refresh access_token if needed and handle the octokit.
  * @async @function handleTokens
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<Response | void>} A promise that resolves on refreshing access_tokens or creating the octokit.
  */
 export const handleTokens = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<Response | void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<Response | void> => {
     const accessToken = getCookie(c, "access_token", "secure");
     const refreshToken = getCookie(c, "refresh_token", "secure");
     c.set("access_token", accessToken);
@@ -31,13 +35,13 @@ export const handleTokens = createMiddleware(
 /**
  * Sets a token in the context and as a secure, HTTP-only cookie with specified attributes.
  * @function setToken
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {keyof Variables} key - The key to set the token value in the context and cookie.
  * @param {string} value - The value of the token to be set.
  * @param {string} expires - The expiration time of the token in seconds.
  */
 const setToken = (
-  c: Context<Env>,
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
   key: keyof Variables,
   value: string,
   expires: string
@@ -56,10 +60,13 @@ const setToken = (
 /**
  * Function to unset a token by setting its value to undefined and deleting its corresponding cookie.
  * @function unsetToken
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {keyof Variables} key - The key of the token to unset from the Variables object.
  */
-export const unsetToken = (c: Context<Env>, key: keyof Variables): void => {
+export const unsetToken = (
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
+  key: keyof Variables
+): void => {
   c.set(key, undefined);
   deleteCookie(c, key, {
     path: "/",
@@ -95,12 +102,15 @@ const fetchRefreshToken = async (
 /**
  * Middleware function to handle token refresh by fetching new tokens.
  * @async @function handleRefresh
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void>} A promise that resolves after handling token refresh.
  */
 export const handleRefresh = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<void> => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { code } = c.req.query();
     const {
@@ -149,12 +159,15 @@ const fetchAccessToken = async (
 /**
  * Middleware function to handle access tokens based on the presence of access_token or refresh_token in the request query.
  * @async @function handleAccess
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<Response | void>} A promise that resolves after handling access tokens and potentially redirecting.
  */
 export const handleAccess = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<Response | void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<Response | void> => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { refresh_token, access_token, expires_in } = c.req.query();
     if (access_token) {
@@ -181,12 +194,15 @@ export const handleAccess = createMiddleware(
 /**
  * Middleware function to handle user logout by unsetting refresh and access tokens.
  * @async @function handleLogout
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void>} A promise that resolves after handling access tokens.
  */
 export const handleLogout = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<void> => {
     unsetToken(c, "refresh_token");
     unsetToken(c, "access_token");
     await next();

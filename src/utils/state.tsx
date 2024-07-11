@@ -1,18 +1,22 @@
-import { Context, Next, Env } from "hono";
+import { Context, Next } from "hono";
 import { setCookie, getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 
+import { Bindings, Variables } from "..";
 import { handleRefresh } from "./tokens";
 
 /**
  * Middleware function to generate and set a state.
  * @async @function generateState
- * @param {Context<Env>} c - The Context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
  * @returns {Promise<void>} A promise that resolves after generating and setting the state.
  */
 export const generateState = createMiddleware(
-  async (c: Context<Env>, next: Next) => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ) => {
     const state = generateRandomString();
     setCookie(c, "state", state, {
       path: "/github",
@@ -30,12 +34,15 @@ export const generateState = createMiddleware(
 /**
  * Middleware function to handle state verification and refresh.
  * @async @function handleState
- * @param {Context<Env>} c The context object.
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c The context object.
  * @param {Next} next The callback function to proceed to the next middleware.
  * @returns {Promise<Response | void>} A promise that resolves on refreshing access_tokens or creating the octokit.
  */
 export const handleState = createMiddleware(
-  async (c: Context<Env>, next: Next): Promise<Response | void> => {
+  async (
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    next: Next
+  ): Promise<Response | void> => {
     const secret = getCookie(c, "state", "secure");
     const { state } = c.req.query();
     if (secret === state) {

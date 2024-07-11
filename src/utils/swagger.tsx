@@ -1,10 +1,13 @@
-import { Env } from "hono";
 import { OpenAPIObjectConfigure, z } from "@hono/zod-openapi";
 
 import { version } from "../../package.json";
+import { Bindings, Variables } from "..";
 
 /* SWAGGER */
-export const swaggerDoc: OpenAPIObjectConfigure<Env, string> = {
+export const swaggerDoc: OpenAPIObjectConfigure<
+  { Bindings: Bindings; Variables: Variables },
+  string
+> = {
   openapi: "3.1.0",
   info: {
     title: "API",
