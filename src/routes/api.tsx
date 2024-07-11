@@ -8,7 +8,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import {
   ErrorSchema,
   ParamsSchema,
-  RepositorySchema,
+  MinimalRepositorySchema,
   swaggerDoc,
 } from "../utils/swagger";
 import { handleMaxId } from "../utils/octokit";
@@ -33,7 +33,7 @@ app.get("/swagger", swaggerUI({ url: `/api/swagger/json`, version: "3.1" }));
 /* ROUTES */
 const route = createRoute({
   method: "get",
-  path: "/{id}?",
+  path: "/{id}",
   request: {
     params: ParamsSchema,
   },
@@ -41,7 +41,7 @@ const route = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: RepositorySchema,
+          schema: MinimalRepositorySchema,
         },
       },
       description: "Get a random repository",
