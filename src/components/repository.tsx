@@ -1,13 +1,16 @@
 import { JSX } from "hono/jsx/jsx-runtime";
 import { Suspense } from "hono/jsx";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
-import { timeAgo } from "../utils/time";
+import { timeAgo, dateOptions } from "../utils/time";
 import { constructUrl } from "../utils/url";
 
 export const Repository = async ({
   repository,
 }: {
-  repository: Promise<Repository>;
+  repository: Promise<
+    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
+  >;
 }) => {
   return (
     <Suspense fallback={<div>{"prout"}</div>}>
@@ -16,12 +19,16 @@ export const Repository = async ({
   );
 }; // TODO handle errors like https://docs.github.com/en/rest/guides/scripting-with-the-rest-api-and-javascript?apiVersion=2022-11-28#handling-rate-limit-errors
 
-const Container = ({ repository }: { repository: Repository }): JSX.Element => {
+const Container = ({
+  repository,
+}: {
+  repository: RestEndpointMethodTypes["repos"]["get"]["response"]["data"];
+}): JSX.Element => {
   const {
     id,
     name,
     full_name,
-    owner: { login, avatar_url, html_url: owner_html_url },
+    owner,
     description,
     html_url,
     created_at,
@@ -38,15 +45,7 @@ const Container = ({ repository }: { repository: Repository }): JSX.Element => {
     default_branch,
     subscribers_count,
   } = repository;
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  };
+  const { login, avatar_url, html_url: owner_html_url } = owner;
   return (
     <div class="container">
       <div class="container-title">

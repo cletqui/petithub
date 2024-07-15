@@ -2,6 +2,7 @@ import { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { Octokit } from "octokit";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
@@ -93,12 +94,12 @@ export const getOctokitInstance = (
  * @async @function getRepositories
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} since - The ID to start fetching repositories from.
- * @returns {Promise<RepositoriesResponse>} A promise that resolves to the response containing an array of repositories.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]>} A promise that resolves to the response containing an array of repositories.
  */
 const getRepositories = async (
   octokit: Octokit,
   since: number
-): Promise<RepositoriesResponse> => {
+): Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]> => {
   try {
     return octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
   } catch (error: any) {
@@ -112,13 +113,13 @@ const getRepositories = async (
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {string} owner - The owner of the repository.
  * @param {string} repo - The name of the repository.
- * @returns {Promise<>} A promise that resolves to the response containing the repository information.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["get"]["response"]>} A promise that resolves to the response containing the repository information.
  */
 export const getRepos = async (
   octokit: Octokit,
   owner: string,
   repo: string
-): Promise<RepositoryResponse> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]> => {
   try {
     return octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
   } catch (error: any) {
@@ -131,12 +132,12 @@ export const getRepos = async (
  * @async @function getRepository
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} id - The ID of the repository to retrieve.
- * @returns {Promise<Repository>} A promise that resolves to the requested repository.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]>} A promise that resolves to the requested repository.
  */
 export const getRepository = async (
   octokit: Octokit,
   id: number
-): Promise<Repository> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
   try {
     const { data, status, url } = await getRepositories(
       octokit,
@@ -167,12 +168,12 @@ export const getRepository = async (
  * @async @function getRandomRepository
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} maxId - The maximum ID to consider for repository selection.
- * @returns {Promise<Repository>} A promise that resolves to the selected repository.
+ * @returns {Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]>} A promise that resolves to the selected repository.
  */
 export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
-): Promise<Repository> => {
+): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
   try {
     const maxIterations = 10; // max iterations
     for (let loop = 0; loop < maxIterations; loop++) {
@@ -186,12 +187,12 @@ export const getRandomRepository = async (
         } = repo;
         try {
           const { data: repos } = await getRepos(octokit, login, name);
-          const { stargazers_count, size } = repos;
+          const { id, stargazers_count, size } = repos;
           if (stargazers_count === 0 && size > 0) {
             return repos;
           }
           console.log(
-            `${login}/${name} (stars: ${stargazers_count}, size: ${size})`
+            `${login}/${name} (id: ${id}, stars: ${stargazers_count}, size: ${size})`
           );
         } catch (error: any) {
           console.log(`${login}/${name} (${error})`);
@@ -225,11 +226,13 @@ export const fetchRepositoryData = async <T, K extends keyof T>(
  * Asynchronously retrieves the authenticated user's information using the provided Octokit instance.
  * @async @function getAuthenticatedUser
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
- * @returns {Promise<UserResponse>} A Promise that resolves to the user's information response.
+ * @returns {Promise<RestEndpointMethodTypes["users"]["getAuthenticated"]["response"]>} A Promise that resolves to the user's information response.
  */
 export const getAuthenticatedUser = async (
   octokit: Octokit
-): Promise<UserResponse> => {
+): Promise<
+  RestEndpointMethodTypes["users"]["getAuthenticated"]["response"]
+> => {
   try {
     return octokit.rest.users.getAuthenticated(); // octokit.request("GET /user");
   } catch (error: any) {

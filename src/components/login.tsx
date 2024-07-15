@@ -1,6 +1,7 @@
 import { Suspense } from "hono/jsx";
 import { useRequestContext } from "hono/jsx-renderer";
 import { Octokit } from "octokit";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { getAuthenticatedUser } from "../utils/octokit";
 
@@ -13,13 +14,18 @@ const LoginButton = () => {
   );
 };
 
-const User = async ({ user }: { user: Promise<UserResponse> }) => {
+const User = async ({
+  user,
+}: {
+  user: Promise<
+    RestEndpointMethodTypes["users"]["getAuthenticated"]["response"]
+  >;
+}) => {
   try {
     const c = useRequestContext();
     const { path } = c.req;
-    const {
-      data: { login, avatar_url },
-    } = await user;
+    const { data } = await user;
+    const { login, avatar_url } = data;
     return (
       <button class="button" onclick="logout">
         <a href={`/github/logout?callback_url=${path}`}>

@@ -1,13 +1,13 @@
+import { defineConfig } from "vite";
 import build from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
-import adapter from "@hono/vite-dev-server/cloudflare";
-import { defineConfig } from "vite";
+import cloudflareAdapter from "@hono/vite-dev-server/cloudflare";
 
 export default defineConfig({
   plugins: [
     build(),
     devServer({
-      adapter,
+      adapter: cloudflareAdapter,
       entry: "src/index.tsx",
     }),
   ],

@@ -9,7 +9,7 @@ import { setCookie } from "hono/cookie";
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
-app.use(handleMaxId)
+app.use(handleMaxId);
 app.use(handleTokens);
 
 /* ENDPOINTS */

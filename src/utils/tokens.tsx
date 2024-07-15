@@ -57,10 +57,16 @@ const setToken = (
   });
 };
 
+/**
+ * Function to unset a token by setting its value to undefined and deleting its corresponding cookie.
+ * @function unsetToken
+ * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
+ * @param {keyof Variables} key - The key of the token to unset from the Variables object.
+ */
 export const unsetToken = (
   c: Context<{ Bindings: Bindings; Variables: Variables }>,
   key: keyof Variables
-) => {
+): void => {
   c.set(key, undefined);
   deleteCookie(c, key, {
     path: "/",
@@ -104,7 +110,7 @@ export const handleRefresh = createMiddleware(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) => {
+  ): Promise<void> => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { code } = c.req.query();
     const {
@@ -155,13 +161,13 @@ const fetchAccessToken = async (
  * @async @function handleAccess
  * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The Context object.
  * @param {Next} next - The callback function to proceed to the next middleware.
- * @returns {Promise<void>} A promise that resolves after handling access tokens and potentially redirecting.
+ * @returns {Promise<Response | void>} A promise that resolves after handling access tokens and potentially redirecting.
  */
 export const handleAccess = createMiddleware(
   async (
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
-  ) => {
+  ): Promise<Response | void> => {
     const { CLIENT_ID, CLIENT_SECRET } = c.env;
     const { refresh_token, access_token, expires_in } = c.req.query();
     if (access_token) {

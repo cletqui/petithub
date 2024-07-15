@@ -2,6 +2,7 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { PropsWithChildren, Suspense } from "hono/jsx";
 import { JSX } from "hono/jsx/jsx-runtime";
 import { useRequestContext } from "hono/jsx-renderer";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { fetchRepositoryData } from "./octokit";
 import { Loader } from "../components/loader";
@@ -10,7 +11,9 @@ import { Login } from "../components/login";
 const Head = ({
   repository,
 }: {
-  repository: Promise<Repository>;
+  repository: Promise<
+    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
+  >;
 }) => {
   const full_name = fetchRepositoryData(repository, "full_name");
   return (
@@ -32,51 +35,65 @@ const Head = ({
   );
 };
 
+const Header = (): JSX.Element => {
+  const c = useRequestContext();
+  const { octokit } = c.var;
+  return (
+    <header class="header">
+      <img
+        class="icon refresh"
+        src="/static/icons/refresh.svg"
+        onclick="window.location.reload()"
+      />
+      <h1 class="title">{"PetitHub"}</h1>
+      <Login octokit={octokit} />
+    </header>
+  );
+};
+
+const Footer = (): JSX.Element => {
+  return (
+    <footer class="footer">
+      <p>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://github.com/cletqui/petithub"
+          title="GitHub"
+        >
+          <img
+            src="/static/icons/github.svg"
+            alt="GitHub"
+            class="icon github-icon"
+          />
+        </a>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.buymeacoffee.com/cletqui"
+          title="BuyMeACoffee"
+        >
+          <img
+            src="/static/icons/buymeacoffee.svg"
+            alt="BuyMeACoffee"
+            class="icon buymeacoffee-icon"
+          />
+        </a>
+      </p>
+    </footer>
+  );
+};
+
 const Body = async ({ children }: PropsWithChildren) => {
   const c = useRequestContext();
   const { octokit } = c.var;
   return (
     <body>
-      <header class="header">
-        <img
-          class="icon refresh"
-          src="/static/icons/refresh.svg"
-          onclick="window.location.reload()"
-        />
-        <h1 class="title">{"PetitHub"}</h1>
-        <Login octokit={octokit} />
-      </header>
+      <Header />
       <div class="container-wrapper">
         <Suspense fallback={<Loader />}>{children}</Suspense>
       </div>
-      <footer class="footer">
-        <p>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/cletqui/petithub"
-            title="GitHub"
-          >
-            <img
-              src="/static/icons/github.svg"
-              alt="GitHub"
-              class="icon github-icon"
-            />
-          </a>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.buymeacoffee.com/cletqui"
-            title="BuyMeACoffee"
-          >
-            <img
-              src="/static/icons/buymeacoffee.svg"
-              alt="BuyMeACoffee"
-              class="icon buymeacoffee-icon"
-            />
-          </a>
-        </p>
-      </footer>
+      <Footer />
     </body>
   );
 };

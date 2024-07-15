@@ -3,9 +3,9 @@ import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 
 import { renderer } from "./utils/renderer";
-import { Repository } from "./components/repository";
-import { getRandomRepository, handleMaxId } from "./utils/octokit";
 import { handleTokens } from "./utils/tokens";
+import { getRandomRepository, handleMaxId } from "./utils/octokit";
+import { Repository } from "./components/repository";
 
 import api from "./routes/api";
 import github from "./routes/github";
@@ -14,7 +14,6 @@ import id from "./routes/id";
 
 /* TYPES */
 export type Bindings = {
-  GITHUB_TOKEN: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
 };
@@ -56,11 +55,11 @@ app.get(
 );
 
 /* DEFAULT */
-app.get(
+/* app.get(
   "*",
   (c: Context<{ Bindings: Bindings; Variables: Variables }>): Response => {
     return c.redirect("/", 301);
   }
-);
+); */
 
 export default app;
