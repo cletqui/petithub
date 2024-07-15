@@ -30,7 +30,7 @@
     "deploy": "$npm_execpath run build && wrangler pages deploy"
   },
   "dependencies": {
-    "hono": "^4.4.12",
+    "hono": "^4.4.13",
     "octokit": "^4.0.2"
   },
   "devDependencies": {
