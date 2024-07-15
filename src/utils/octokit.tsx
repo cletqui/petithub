@@ -187,12 +187,12 @@ export const getRandomRepository = async (
         } = repo;
         try {
           const { data: repos } = await getRepos(octokit, login, name);
-          const { stargazers_count, size } = repos;
+          const { id, stargazers_count, size } = repos;
           if (stargazers_count === 0 && size > 0) {
             return repos;
           }
           console.log(
-            `${login}/${name} (stars: ${stargazers_count}, size: ${size})`
+            `${login}/${name} (id: ${id}, stars: ${stargazers_count}, size: ${size})`
           );
         } catch (error: any) {
           console.log(`${login}/${name} (${error})`);

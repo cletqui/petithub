@@ -172,7 +172,7 @@ Happy exploring! 🌟
   - [x] change the document title dynamically (with nested `Suspense`)
   - [x] use nested renderer to render multiple components
   - [x] use `useRequestContext` to have conditional render
-  - [ ] implement Swagger with API
+  - [x] implement Swagger with API
   - [x] add profile name + icon when connected + fix UI
   - [x] add possibility to logout
   - [ ] allow starring repo when connected

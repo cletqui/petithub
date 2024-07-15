@@ -1,6 +1,6 @@
 {
   "name": "petithub",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": false,
   "description": "PetitHub - Explore obscure GitHub repositories",
   "author": {
@@ -32,15 +32,15 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.3.0",
     "@hono/zod-openapi": "^0.14.9",
-    "hono": "^4.4.12",
+    "hono": "^4.4.13",
     "octokit": "^4.0.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240620.0",
+    "@cloudflare/workers-types": "^4.20240712.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.12.2",
     "vite": "^5.3.3",
-    "vitest": "^2.0.2",
-    "wrangler": "^3.63.2"
+    "vitest": "^2.0.3",
+    "wrangler": "^3.64.0"
   }
 }
