@@ -2,11 +2,11 @@ import { Context } from "hono";
 import { poweredBy } from "hono/powered-by";
 import { prettyJSON } from "hono/pretty-json";
 import { cors } from "hono/cors";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
+import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
-import { swaggerDoc } from "../utils/swagger";
 import { ErrorSchema, RepositorySchema, ParamsSchema } from "../utils/schema";
 import { handleMaxId } from "../utils/octokit";
 import { handleTokens } from "../utils/tokens";
@@ -30,8 +30,32 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 });
 
 /* SWAGGER */
-app.doc31("/swagger.json", (c) => swaggerDoc(c));
 app.get("/swagger", swaggerUI({ url: `/api/swagger.json`, version: "3.1" }));
+app.doc31("/swagger.json", (c) => {
+  return {
+    openapi: "3.1.0",
+    info: {
+      title: "API",
+      version: version,
+      description: "PetitHub - [GitHub](https://github.com/cletqui/petithub)",
+      contact: {
+        name: "cletqui",
+        url: "https://github.com/cletqui/petithub/issues",
+      },
+      license: {
+        name: "MIT",
+        url: "https://opensource.org/license/MIT",
+      },
+    },
+    servers: [{ url: `${new URL(c.req.url).origin}/api`, description: "API" }],
+    tags: [
+      {
+        name: "API",
+        description: "Default API",
+      },
+    ],
+  };
+});
 
 /* ROUTES */
 const route = createRoute({
