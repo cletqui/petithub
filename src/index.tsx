@@ -55,11 +55,11 @@ app.get(
 );
 
 /* DEFAULT */
-/* app.get(
+app.get(
   "*",
   (c: Context<{ Bindings: Bindings; Variables: Variables }>): Response => {
     return c.redirect("/", 301);
   }
-); */
+);
 
 export default app;

@@ -13,7 +13,7 @@ export const Repository = async ({
   >;
 }) => {
   return (
-    <Suspense fallback={<div>{"prout"}</div>}>
+    <Suspense fallback={<div>{"error"}</div>}>
       <Container repository={await repository} />
     </Suspense>
   );
@@ -200,7 +200,7 @@ const Container = ({
             {description && <p>{description}</p>}
             {topics && topics?.length > 0 && (
               <div>
-                {topics.map((topic: any) => (
+                {topics.map((topic: string) => (
                   <a
                     class="topic"
                     target="_blank"
