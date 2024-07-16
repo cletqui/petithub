@@ -1,6 +1,7 @@
 import { Context } from "hono";
 import { poweredBy } from "hono/powered-by";
 import { prettyJSON } from "hono/pretty-json";
+import { trimTrailingSlash } from 'hono/trailing-slash'
 import { cors } from "hono/cors";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
@@ -18,6 +19,7 @@ const app = new OpenAPIHono<{ Bindings: Bindings; Variables: Variables }>();
 /* MIDDLEWARES */
 app.use(poweredBy());
 app.use(prettyJSON());
+app.use(trimTrailingSlash())
 app.use(cors({ origin: "*", allowMethods: ["GET"], credentials: true }));
 app.use(handleMaxId);
 app.use(handleTokens);
@@ -31,31 +33,36 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 
 /* SWAGGER */
 app.get("/swagger", swaggerUI({ url: `/api/swagger.json`, version: "3.1" }));
-app.doc31("/swagger.json", (c) => {
-  return {
-    openapi: "3.1.0",
-    info: {
-      title: "API",
-      version: version,
-      description: "PetitHub - [GitHub](https://github.com/cletqui/petithub)",
-      contact: {
-        name: "cletqui",
-        url: "https://github.com/cletqui/petithub/issues",
+app.doc31(
+  "/swagger.json",
+  (c: Context<{ Bindings: Bindings; Variables: Variables }>) => {
+    return {
+      openapi: "3.1.0",
+      info: {
+        title: "API",
+        version: version,
+        description: "PetitHub - [GitHub](https://github.com/cletqui/petithub)",
+        contact: {
+          name: "cletqui",
+          url: "https://github.com/cletqui/petithub/issues",
+        },
+        license: {
+          name: "MIT",
+          url: "https://opensource.org/license/MIT",
+        },
       },
-      license: {
-        name: "MIT",
-        url: "https://opensource.org/license/MIT",
-      },
-    },
-    servers: [{ url: `${new URL(c.req.url).origin}/api`, description: "API" }],
-    tags: [
-      {
-        name: "API",
-        description: "Default API",
-      },
-    ],
-  };
-});
+      servers: [
+        { url: `${new URL(c.req.url).origin}/api`, description: "API" },
+      ],
+      tags: [
+        {
+          name: "API",
+          description: "Default API",
+        },
+      ],
+    };
+  }
+);
 
 /* ROUTES */
 const route = createRoute({
