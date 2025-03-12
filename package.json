@@ -30,17 +30,17 @@
     "deploy": "$npm_execpath run build && wrangler pages deploy"
   },
   "dependencies": {
-    "@hono/swagger-ui": "^0.5.0",
-    "@hono/zod-openapi": "^0.18.3",
-    "hono": "^4.6.19",
-    "octokit": "^4.1.0"
+    "@hono/swagger-ui": "^0.5.1",
+    "@hono/zod-openapi": "^0.19.2",
+    "hono": "^4.7.4",
+    "octokit": "^4.1.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250124.3",
+    "@cloudflare/workers-types": "^4.20250311.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
-    "@hono/vite-dev-server": "^0.18.1",
-    "vite": "^6.0.11",
-    "vitest": "^3.0.4",
-    "wrangler": "^3.105.1"
+    "@hono/vite-dev-server": "^0.19.0",
+    "vite": "^6.2.1",
+    "vitest": "^3.0.8",
+    "wrangler": "^3.114.1"
   }
 }
