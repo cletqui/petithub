@@ -33,7 +33,7 @@
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.2",
     "hono": "^4.7.5",
-    "octokit": "^4.1.2"
+    "octokit": "^4.1.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250321.0",
