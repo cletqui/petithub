@@ -30,7 +30,7 @@
     "deploy": "$npm_execpath run build && wrangler pages deploy"
   },
   "dependencies": {
-    "@hono/swagger-ui": "^0.5.1",
+    "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^0.19.6",
     "hono": "^4.7.8",
     "octokit": "^4.1.3"
