@@ -27,7 +27,7 @@ const User = async ({
     const { data } = await user;
     const { login, avatar_url } = data;
     return (
-      <button class="button" onclick="logout">
+      <button class="button">
         <a href={`/github/logout?callback_url=${path}`}>
           <img class="avatar" src={avatar_url} alt="avatar" />
           {login}

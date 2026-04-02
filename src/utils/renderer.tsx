@@ -40,12 +40,14 @@ const Header = (): JSX.Element => {
   const { octokit } = c.var;
   return (
     <header class="header">
-      <img
-        class="icon refresh"
-        src="/static/icons/refresh.svg"
-        onclick="window.location.reload()"
-      />
-      <h1 class="title">{"PetitHub"}</h1>
+      <div class="header-brand">
+        <img
+          class="icon refresh"
+          src="/static/icons/refresh.svg"
+          onclick="window.location.reload()"
+        />
+        <h1 class="title">{"PetitHub"}</h1>
+      </div>
       <Login octokit={octokit} />
     </header>
   );
