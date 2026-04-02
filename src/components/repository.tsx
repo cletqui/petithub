@@ -5,6 +5,35 @@ import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 import { timeAgo, dateOptions } from "../utils/time";
 import { constructUrl } from "../utils/url";
 
+const LANGUAGE_COLORS: Record<string, string> = {
+  JavaScript: "#f1e05a",
+  TypeScript: "#3178c6",
+  Python: "#3572A5",
+  Java: "#b07219",
+  C: "#555555",
+  "C++": "#f34b7d",
+  "C#": "#178600",
+  Go: "#00ADD8",
+  Rust: "#dea584",
+  Ruby: "#701516",
+  PHP: "#4F5D95",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  Shell: "#89e051",
+  Swift: "#F05138",
+  Kotlin: "#A97BFF",
+  Scala: "#c22d40",
+  R: "#198CE7",
+  Dart: "#00B4AB",
+  Vue: "#41b883",
+  Haskell: "#5e5086",
+  Perl: "#0298c3",
+  Lua: "#000080",
+};
+
+const getLanguageColor = (language: string | null): string =>
+  (language && LANGUAGE_COLORS[language]) || "#8b949e";
+
 export const Repository = async ({
   repository,
 }: {
@@ -57,15 +86,15 @@ const Container = ({
         >
           <img class="avatar" src={avatar_url} alt="avatar" />
         </a>
-        <a
-          class="repo-title"
-          target="_blank"
-          rel="noopener noreferrer"
-          href={html_url}
-          title={`${full_name} (${id})`}
-        >
-          {name}
-        </a>
+        <span class="repo-title" title={`${full_name} (${id})`}>
+          <a target="_blank" rel="noopener noreferrer" href={owner_html_url}>
+            {login}
+          </a>
+          <span class="muted">{" / "}</span>
+          <a target="_blank" rel="noopener noreferrer" href={html_url}>
+            {name}
+          </a>
+        </span>
         <span class="visibility-badge">{visibility}</span>
       </div>
       <div class="container-layout">
@@ -79,7 +108,7 @@ const Container = ({
               <button id="watch-button" class="button">
                 <img src="/static/icons/eye.svg" alt="watch" class="icon" />
                 <div class="label">{"Watch"}</div>
-                <div>{(watchers_count || 0) + (subscribers_count || 0)}</div>
+                <div>{subscribers_count || 0}</div>
               </button>
               <button id="fork-button" class="button">
                 <img src="/static/icons/fork.svg" alt="fork" class="icon" />
@@ -225,13 +254,13 @@ const Container = ({
                 </a>
               </p>
             )}
-            {!description && !homepage && topics?.length === 0 && (
+            {!description && !homepage && (!topics || topics.length === 0) && (
               <p>
                 <i>{"No description, website, or topics provided."}</i>
               </p>
             )}
           </div>
-          <div class={`block muted ${language && "block-border"}`}>
+          <div class={`block muted ${language ? "block-border" : ""}`}>
             {license && (
               <p>
                 <a
@@ -245,7 +274,7 @@ const Container = ({
                     alt="license"
                     class="icon"
                   />
-                  {`${license.key?.toUpperCase()} license`}
+                  {`${license.spdx_id || license.name || license.key?.toUpperCase()} license`}
                 </a>
               </p>
             )}
@@ -283,7 +312,7 @@ const Container = ({
                 href={`${html_url}/watchers`}
               >
                 <img src="/static/icons/eye.svg" alt="watchers" class="icon" />
-                {`${(watchers_count || 0) + (subscribers_count || 0)} watching`}
+                {`${subscribers_count || 0} watching`}
               </a>
             </p>
             <p>
@@ -312,7 +341,13 @@ const Container = ({
             <>
               <b>{"Languages"}</b>
               <div class="block">
-                <p>{language}</p>
+                <p style="display:flex;align-items:center;gap:0.5rem;">
+                  <span
+                    class="language-dot"
+                    style={`background-color:${getLanguageColor(language)}`}
+                  />
+                  {language}
+                </p>
               </div>
             </>
           )}
