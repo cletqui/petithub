@@ -1,9 +1,8 @@
 import { Suspense } from "hono/jsx";
 import { useRequestContext } from "hono/jsx-renderer";
-import { Octokit } from "octokit";
 import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
-import { getAuthenticatedUser } from "../utils/octokit";
+import { getAuthenticatedUser, type Octokit } from "../utils/octokit";
 
 const LoginButton = () => {
   return (

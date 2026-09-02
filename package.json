@@ -32,8 +32,9 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.6.1",
-    "hono": "^4.13.5",
-    "octokit": "^5.0.5"
+    "@octokit/core": "^7.0.8",
+    "@octokit/plugin-rest-endpoint-methods": "^18.0.0",
+    "hono": "^4.13.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260902.1",

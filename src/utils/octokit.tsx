@@ -1,11 +1,17 @@
 import { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
-import { Octokit } from "octokit";
-import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
+import { Octokit as OctokitCore } from "@octokit/core";
+import {
+  restEndpointMethods,
+  RestEndpointMethodTypes,
+} from "@octokit/plugin-rest-endpoint-methods";
 
 import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
+
+export const Octokit = OctokitCore.plugin(restEndpointMethods);
+export type Octokit = InstanceType<typeof Octokit>;
 
 /**
  * Asynchronously verifies a token by calling the rate-limit endpoint (which does
@@ -305,5 +311,7 @@ export const getMaxId = async (
     max -= 1;
   }
   const last = await getRepositories(octokit, middle);
-  return last.data.length > 0 ? last.data[last.data.length - 1].id : prev;
+  return last.data.length > 0
+    ? Number(last.data[last.data.length - 1].id)
+    : prev;
 };
