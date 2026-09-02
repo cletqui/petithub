@@ -11,5 +11,7 @@ export default defineConfig({
       entry: "src/index.tsx",
     }),
   ],
-  optimizeDeps: { include: ["hono", "octokit"] },
+  optimizeDeps: {
+    include: ["hono", "@octokit/core", "@octokit/plugin-rest-endpoint-methods"],
+  },
 });

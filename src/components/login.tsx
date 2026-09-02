@@ -8,7 +8,7 @@ const LoginButton = () => {
   return (
     <a class="button" href="/github/login">
       <img src="/static/icons/github.svg" alt="" class="icon" />
-      {"Login with GitHub"}
+      <span class="button-text">{"Login with GitHub"}</span>
     </a>
   );
 };
@@ -31,7 +31,7 @@ const User = async ({
         href={`/github/logout?callback_url=${encodeURIComponent(path)}`}
       >
         <img class="avatar" src={avatar_url} alt="" />
-        {login}
+        <span class="button-text">{login}</span>
       </a>
     );
   } catch (_) {
