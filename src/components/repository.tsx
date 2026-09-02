@@ -4,6 +4,21 @@ import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { timeAgo, dateOptions } from "../utils/time";
 import { constructUrl } from "../utils/url";
+import { Loader } from "./loader";
+
+type RepositoryData = RestEndpointMethodTypes["repos"]["get"]["response"]["data"];
+
+const RepositoryError = (): JSX.Element => (
+  <div class="container">
+    <p>
+      {"Couldn't load a repository right now — GitHub may be rate-limiting. "}
+      <a href="/">{"Try again"}</a>
+      {" or "}
+      <a href="/github/login">{"sign in"}</a>
+      {" to lift the limit."}
+    </p>
+  </div>
+);
 
 const LANGUAGE_COLORS: Record<string, string> = {
   JavaScript: "#f1e05a",
@@ -34,19 +49,29 @@ const LANGUAGE_COLORS: Record<string, string> = {
 const getLanguageColor = (language: string | null): string =>
   (language && LANGUAGE_COLORS[language]) || "#8b949e";
 
-export const Repository = async ({
+const ResolvedRepository = async ({
   repository,
 }: {
-  repository: Promise<
-    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
-  >;
+  repository: Promise<RepositoryData>;
+}) => {
+  try {
+    return <Container repository={await repository} />;
+  } catch (_) {
+    return <RepositoryError />;
+  }
+};
+
+export const Repository = ({
+  repository,
+}: {
+  repository: Promise<RepositoryData>;
 }) => {
   return (
-    <Suspense fallback={<div>{"error"}</div>}>
-      <Container repository={await repository} />
+    <Suspense fallback={<Loader />}>
+      <ResolvedRepository repository={repository} />
     </Suspense>
   );
-}; // TODO handle errors like https://docs.github.com/en/rest/guides/scripting-with-the-rest-api-and-javascript?apiVersion=2022-11-28#handling-rate-limit-errors
+};
 
 const Container = ({
   repository,
@@ -65,7 +90,6 @@ const Container = ({
     pushed_at,
     homepage,
     stargazers_count,
-    watchers_count,
     language,
     forks_count,
     license,
@@ -84,7 +108,7 @@ const Container = ({
           href={owner_html_url}
           title={login}
         >
-          <img class="avatar" src={avatar_url} alt="avatar" />
+          <img class="avatar" src={avatar_url} alt={login} />
         </a>
         <span class="repo-title" title={`${full_name} (${id})`}>
           <a target="_blank" rel="noopener noreferrer" href={owner_html_url}>
@@ -101,41 +125,60 @@ const Container = ({
         <div class="layout-main">
           <div class="layout-main-header">
             <div class="row">
-              <button id="branch-button" class="button">
-                <img src="/static/icons/branch.svg" alt="branch" class="icon" />
+              <a
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/branches`}
+              >
+                <img src="/static/icons/branch.svg" alt="" class="icon" />
                 <div>{default_branch}</div>
-              </button>
-              <button id="watch-button" class="button">
-                <img src="/static/icons/eye.svg" alt="watch" class="icon" />
+              </a>
+              <a
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/watchers`}
+              >
+                <img src="/static/icons/eye.svg" alt="" class="icon" />
                 <div class="label">{"Watch"}</div>
                 <div>{subscribers_count || 0}</div>
-              </button>
-              <button id="fork-button" class="button">
-                <img src="/static/icons/fork.svg" alt="fork" class="icon" />
+              </a>
+              <a
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/forks`}
+              >
+                <img src="/static/icons/fork.svg" alt="" class="icon" />
                 <div class="label">{"Fork"}</div>
                 <div>{forks_count || 0}</div>
-              </button>
-              <button id="star-button" class="button">
-                <img src="/static/icons/star.svg" alt="star" class="icon" />
+              </a>
+              <a
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${html_url}/stargazers`}
+              >
+                <img src="/static/icons/star.svg" alt="" class="icon" />
                 <div class="label">{"Star"}</div>
                 <div>{stargazers_count || 0}</div>
-              </button>
-            </div>
-            <button id="code-button" class="button code-button">
-              <a target="_blank" rel="noopener noreferrer" href={html_url}>
-                <img
-                  src="/static/icons/code.svg"
-                  alt="code"
-                  class="icon icon"
-                />
-                <div>{"Code"}</div>
-                <img
-                  src="/static/icons/triangle.svg"
-                  alt="go"
-                  class="icon small-icon"
-                />
               </a>
-            </button>
+            </div>
+            <a
+              class="button code-button"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={html_url}
+            >
+              <img src="/static/icons/code.svg" alt="" class="icon" />
+              <div>{"Code"}</div>
+              <img
+                src="/static/icons/triangle.svg"
+                alt=""
+                class="icon small-icon"
+              />
+            </a>
           </div>
           <table class="main-table">
             <thead>

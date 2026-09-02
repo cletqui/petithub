@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local development (never commit .dev.vars).
+# In production these are set as Cloudflare Pages secrets.
+
+# GitHub App OAuth credentials (github.com/apps/cletqui-petithub)
+CLIENT_ID=
+CLIENT_SECRET=

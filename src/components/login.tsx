@@ -7,10 +7,10 @@ import { getAuthenticatedUser } from "../utils/octokit";
 
 const LoginButton = () => {
   return (
-    <button class="button">
-      <img src="/static/icons/github.svg" alt="GitHub" class="icon" />
-      <a href="/github/login">{"Login with GitHub"}</a>
-    </button>
+    <a class="button" href="/github/login">
+      <img src="/static/icons/github.svg" alt="" class="icon" />
+      {"Login with GitHub"}
+    </a>
   );
 };
 
@@ -27,12 +27,13 @@ const User = async ({
     const { data } = await user;
     const { login, avatar_url } = data;
     return (
-      <button class="button">
-        <a href={`/github/logout?callback_url=${path}`}>
-          <img class="avatar" src={avatar_url} alt="avatar" />
-          {login}
-        </a>
-      </button>
+      <a
+        class="button"
+        href={`/github/logout?callback_url=${encodeURIComponent(path)}`}
+      >
+        <img class="avatar" src={avatar_url} alt="" />
+        {login}
+      </a>
     );
   } catch (_) {
     return <LoginButton />;
@@ -46,4 +47,4 @@ export const Login = async ({ octokit }: { octokit: Octokit }) => {
       <User user={user} />
     </Suspense>
   );
-}; // TODO fix UI
+};

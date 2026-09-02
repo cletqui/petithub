@@ -23,17 +23,25 @@ app.get(
       access_token,
       octokit,
     } = c.var;
-    const update = access_token ? await getMaxId(octokit, id) : id;
-    const timestamp = access_token ? new Date().getTime() : old;
-    setCookie(c, "max_id", `{ "id": ${update}, "timestamp": ${timestamp} }`, {
+    let update = id;
+    let timestamp = old;
+    if (access_token) {
+      try {
+        update = await getMaxId(octokit, id);
+        timestamp = Date.now();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    setCookie(c, "max_id", JSON.stringify({ id: update, timestamp }), {
       path: "/",
       secure: true,
-      httpOnly: false, // true
+      httpOnly: false,
       maxAge: 31557600,
       sameSite: "Strict",
       prefix: "secure",
     });
-    return c.json({ id: update, timestamp: timestamp });
+    return c.json({ id: update, timestamp });
   }
 );
 

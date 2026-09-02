@@ -1,7 +1,6 @@
 import { Context } from "hono";
-import { poweredBy } from "hono/powered-by";
 import { prettyJSON } from "hono/pretty-json";
-import { trimTrailingSlash } from 'hono/trailing-slash'
+import { trimTrailingSlash } from "hono/trailing-slash";
 import { cors } from "hono/cors";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
@@ -17,13 +16,9 @@ import { apiAuth, getRandomRepository, getRepository } from "../utils/octokit";
 const app = new OpenAPIHono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
-app.use(poweredBy());
 app.use(prettyJSON());
-app.use(trimTrailingSlash())
-app.use(cors({ origin: "*", allowMethods: ["GET"], credentials: true }));
-app.use(handleMaxId);
-app.use(handleTokens);
-app.use(apiAuth);
+app.use(trimTrailingSlash());
+app.use(cors({ origin: "*", allowMethods: ["GET"] }));
 
 /* SECURITY */
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
@@ -31,7 +26,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   scheme: "bearer",
 });
 
-/* SWAGGER */
+/* SWAGGER (public — must be registered before apiAuth) */
 app.get("/swagger", swaggerUI({ url: `/api/swagger.json`, version: "3.1" }));
 app.doc31(
   "/swagger.json",
@@ -63,6 +58,11 @@ app.doc31(
     };
   }
 );
+
+/* AUTH (applies only to the data endpoints below) */
+app.use(handleMaxId);
+app.use(handleTokens);
+app.use(apiAuth);
 
 /* ROUTES */
 const route = createRoute({
@@ -114,11 +114,12 @@ app.openapi(
       const repository = id
         ? await getRepository(octokit, Number(id))
         : await getRandomRepository(octokit, max_id.id);
-      if (id && repository.id != Number(id)) {
+      if (id && repository.id !== Number(id)) {
         return c.redirect(`/api/${repository.id}`, 302);
       }
       return c.json(repository, 200);
-    } catch (error: any) {
+    } catch (error) {
+      console.error(error);
       return c.json({ message: "Failed to fetch repository data" }, 500);
     }
   }

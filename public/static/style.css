@@ -85,13 +85,18 @@ body {
   -moz-box-align: center;
   align-items: center;
 }
+.refresh-link {
+  display: flex;
+  align-items: center;
+}
 .header .refresh {
   -moz-box-align: center;
   -moz-box-pack: end;
   animation: 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0s 1 refresh;
   transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-.header .refresh:hover {
+.refresh-link:hover .refresh,
+.refresh-link:focus-visible .refresh {
   transform: rotate(90deg);
 }
 @keyframes refresh {
