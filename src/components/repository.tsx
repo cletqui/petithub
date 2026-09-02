@@ -8,6 +8,29 @@ import { Loader } from "./loader";
 
 type RepositoryData = RestEndpointMethodTypes["repos"]["get"]["response"]["data"];
 
+const RepoButton = ({
+  href,
+  icon,
+  label,
+  count,
+  caret,
+}: {
+  href: string;
+  icon: string;
+  label: string;
+  count?: number;
+  caret?: boolean;
+}): JSX.Element => (
+  <a class="button" target="_blank" rel="noopener noreferrer" href={href}>
+    <img src={icon} alt="" class="icon" />
+    <span class="label">{label}</span>
+    {count !== undefined && <span class="counter">{count}</span>}
+    {caret && (
+      <img src="/static/icons/triangle.svg" alt="" class="icon caret" />
+    )}
+  </a>
+);
+
 const RepositoryError = (): JSX.Element => (
   <div class="container">
     <p>
@@ -97,10 +120,21 @@ const Container = ({
     visibility,
     default_branch,
     subscribers_count,
+    archived,
+    allow_forking,
   } = repository;
-  const { login, avatar_url, html_url: owner_html_url } = owner;
+  const { login, avatar_url, html_url: owner_html_url, type } = owner;
+  const isOrg = type === "Organization";
   return (
     <div class="container">
+      {archived && (
+        <div class="archived-banner">
+          <img src="/static/icons/archive.svg" alt="" class="icon" />
+          {
+            "This repository has been archived by the owner. It is now read-only."
+          }
+        </div>
+      )}
       <div class="container-title">
         <a
           target="_blank"
@@ -108,7 +142,11 @@ const Container = ({
           href={owner_html_url}
           title={login}
         >
-          <img class="avatar" src={avatar_url} alt={login} />
+          <img
+            class={isOrg ? "avatar avatar-org" : "avatar"}
+            src={avatar_url}
+            alt={login}
+          />
         </a>
         <span class="repo-title" title={`${full_name} (${id})`}>
           <a target="_blank" rel="noopener noreferrer" href={owner_html_url}>
@@ -125,45 +163,32 @@ const Container = ({
         <div class="layout-main">
           <div class="layout-main-header">
             <div class="row">
-              <a
-                class="button"
-                target="_blank"
-                rel="noopener noreferrer"
+              <RepoButton
                 href={`${html_url}/branches`}
-              >
-                <img src="/static/icons/branch.svg" alt="" class="icon" />
-                <div>{default_branch}</div>
-              </a>
-              <a
-                class="button"
-                target="_blank"
-                rel="noopener noreferrer"
+                icon="/static/icons/branch.svg"
+                label={default_branch}
+                caret
+              />
+              <RepoButton
                 href={`${html_url}/watchers`}
-              >
-                <img src="/static/icons/eye.svg" alt="" class="icon" />
-                <div class="label">{"Watch"}</div>
-                <div>{subscribers_count || 0}</div>
-              </a>
-              <a
-                class="button"
-                target="_blank"
-                rel="noopener noreferrer"
-                href={`${html_url}/forks`}
-              >
-                <img src="/static/icons/fork.svg" alt="" class="icon" />
-                <div class="label">{"Fork"}</div>
-                <div>{forks_count || 0}</div>
-              </a>
-              <a
-                class="button"
-                target="_blank"
-                rel="noopener noreferrer"
+                icon="/static/icons/eye.svg"
+                label="Watch"
+                count={subscribers_count || 0}
+              />
+              {allow_forking !== false && (
+                <RepoButton
+                  href={`${html_url}/forks`}
+                  icon="/static/icons/fork.svg"
+                  label="Fork"
+                  count={forks_count || 0}
+                />
+              )}
+              <RepoButton
                 href={`${html_url}/stargazers`}
-              >
-                <img src="/static/icons/star.svg" alt="" class="icon" />
-                <div class="label">{"Star"}</div>
-                <div>{stargazers_count || 0}</div>
-              </a>
+                icon="/static/icons/star.svg"
+                label="Star"
+                count={stargazers_count || 0}
+              />
             </div>
             <a
               class="button code-button"
@@ -172,12 +197,8 @@ const Container = ({
               href={html_url}
             >
               <img src="/static/icons/code.svg" alt="" class="icon" />
-              <div>{"Code"}</div>
-              <img
-                src="/static/icons/triangle.svg"
-                alt=""
-                class="icon small-icon"
-              />
+              <span>{"Code"}</span>
+              <img src="/static/icons/triangle.svg" alt="" class="icon caret" />
             </a>
           </div>
           <table class="main-table">
@@ -197,7 +218,7 @@ const Container = ({
                     rel="noopener noreferrer"
                     href={owner_html_url}
                   >
-                    <img class="avatar icon" src={avatar_url} alt="avatar" />
+                    <img class="avatar icon" src={avatar_url} alt="" />
                     <b>{login}</b>
                   </a>
                 </td>
@@ -209,7 +230,7 @@ const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/create.svg"
-                      alt="create"
+                      alt=""
                       class="icon small-icon"
                     />
                     {"creation"}
@@ -228,7 +249,7 @@ const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/update.svg"
-                      alt="update"
+                      alt=""
                       class="icon small-icon"
                     />
                     {"update"}
@@ -247,7 +268,7 @@ const Container = ({
                   <td class="label-column">
                     <img
                       src="/static/icons/push.svg"
-                      alt="push"
+                      alt=""
                       class="icon small-icon"
                     />
                     {"push"}
@@ -266,12 +287,24 @@ const Container = ({
         </div>
         <div class="layout-sidebar">
           <div class="block">
-            <p>
+            <p class="sidebar-heading">
               <b>{"About"}</b>
             </p>
             {description && <p>{description}</p>}
-            {topics && topics?.length > 0 && (
-              <div>
+            {homepage && (
+              <p class="homepage">
+                <img src="/static/icons/link.svg" alt="" class="icon" />
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`${constructUrl(homepage, "https://github.com/")}`}
+                >
+                  {homepage}
+                </a>
+              </p>
+            )}
+            {topics && topics.length > 0 && (
+              <div class="topics">
                 {topics.map((topic: string) => (
                   <a
                     class="topic"
@@ -283,19 +316,6 @@ const Container = ({
                   </a>
                 ))}
               </div>
-            )}
-            {homepage && (
-              <p class="homepage">
-                {" "}
-                <img src="/static/icons/link.svg" alt="homepage" class="icon" />
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${constructUrl(homepage, "https://github.com/")}`}
-                >
-                  {homepage}
-                </a>
-              </p>
             )}
             {!description && !homepage && (!topics || topics.length === 0) && (
               <p>
@@ -314,7 +334,7 @@ const Container = ({
                 >
                   <img
                     src="/static/icons/license.svg"
-                    alt="license"
+                    alt=""
                     class="icon"
                   />
                   {`${license.spdx_id || license.name || license.key?.toUpperCase()} license`}
@@ -330,7 +350,7 @@ const Container = ({
               >
                 <img
                   src="/static/icons/activity.svg"
-                  alt="activity"
+                  alt=""
                   class="icon"
                 />
                 {"Activity"}
@@ -343,7 +363,7 @@ const Container = ({
                 rel="noopener noreferrer"
                 href={`${html_url}/stargazers`}
               >
-                <img src="/static/icons/star.svg" alt="stars" class="icon" />
+                <img src="/static/icons/star.svg" alt="" class="icon" />
                 {`${stargazers_count || 0} stars`}
               </a>
             </p>
@@ -354,7 +374,7 @@ const Container = ({
                 rel="noopener noreferrer"
                 href={`${html_url}/watchers`}
               >
-                <img src="/static/icons/eye.svg" alt="watchers" class="icon" />
+                <img src="/static/icons/eye.svg" alt="" class="icon" />
                 {`${subscribers_count || 0} watching`}
               </a>
             </p>
@@ -365,7 +385,7 @@ const Container = ({
                 rel="noopener noreferrer"
                 href={`${html_url}/forks`}
               >
-                <img src="/static/icons/fork.svg" alt="forks" class="icon" />
+                <img src="/static/icons/fork.svg" alt="" class="icon" />
                 {`${forks_count || 0} forks`}
               </a>
             </p>
@@ -381,18 +401,18 @@ const Container = ({
             </p>
           </div>
           {language && (
-            <>
-              <b>{"Languages"}</b>
-              <div class="block">
-                <p style="display:flex;align-items:center;gap:0.5rem;">
-                  <span
-                    class="language-dot"
-                    style={`background-color:${getLanguageColor(language)}`}
-                  />
-                  {language}
-                </p>
-              </div>
-            </>
+            <div class="block">
+              <p class="sidebar-heading">
+                <b>{"Languages"}</b>
+              </p>
+              <p class="language">
+                <span
+                  class="language-dot"
+                  style={`background-color:${getLanguageColor(language)}`}
+                />
+                {language}
+              </p>
+            </div>
           )}
         </div>
       </div>

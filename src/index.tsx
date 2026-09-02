@@ -12,6 +12,7 @@ import {
 } from "./utils/octokit";
 import { Repository } from "./components/repository";
 
+import { previewApp } from "./routes/__preview";
 import api from "./routes/api";
 import github from "./routes/github";
 import template from "./routes/template";
@@ -50,6 +51,9 @@ app.use("/", handleMaxId);
 app.use("/", handleTokens);
 
 /* ROUTES */
+if (import.meta.env.DEV) {
+  app.route("/__preview", previewApp());
+}
 app.route("/api", api);
 app.route("/github", github);
 app.route("/template", template);

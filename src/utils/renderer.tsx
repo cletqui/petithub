@@ -57,32 +57,26 @@ const Header = (): JSX.Element => {
 const Footer = (): JSX.Element => {
   return (
     <footer class="footer">
-      <p>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://github.com/cletqui/petithub"
-          title="GitHub"
-        >
-          <img
-            src="/static/icons/github.svg"
-            alt="GitHub"
-            class="icon github-icon"
-          />
-        </a>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.buymeacoffee.com/cletqui"
-          title="BuyMeACoffee"
-        >
-          <img
-            src="/static/icons/buymeacoffee.svg"
-            alt="BuyMeACoffee"
-            class="icon buymeacoffee-icon"
-          />
-        </a>
-      </p>
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://github.com/cletqui/petithub"
+        title="GitHub"
+      >
+        <img src="/static/icons/github.svg" alt="GitHub" class="icon" />
+      </a>
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://www.buymeacoffee.com/cletqui"
+        title="Buy me a coffee"
+      >
+        <img
+          src="/static/icons/buymeacoffee.svg"
+          alt="Buy me a coffee"
+          class="icon"
+        />
+      </a>
     </footer>
   );
 };
