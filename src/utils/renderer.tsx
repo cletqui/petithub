@@ -2,6 +2,7 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { PropsWithChildren, Suspense } from "hono/jsx";
 import { JSX } from "hono/jsx/jsx-runtime";
 import { useRequestContext } from "hono/jsx-renderer";
+import { StreamingContext } from "hono/jsx/streaming";
 import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 import { fetchRepositoryData } from "./octokit";
@@ -103,11 +104,15 @@ export const renderer = jsxRenderer(
     children,
     repository,
   }: PropsWithChildren<{ repository?: Promise<RepositoryData> }>): JSX.Element => {
+    const c = useRequestContext();
+    const scriptNonce = c.get("cspNonce");
     return (
-      <html lang="en">
-        <Head repository={repository} />
-        <Body children={children} />
-      </html>
+      <StreamingContext.Provider value={{ scriptNonce }}>
+        <html lang="en">
+          <Head repository={repository} />
+          <Body children={children} />
+        </html>
+      </StreamingContext.Provider>
     );
   },
   { docType: "<!DOCTYPE html>", stream: true }

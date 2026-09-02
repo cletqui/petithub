@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 
 import { Bindings, Variables } from "..";
 import { Repository } from "../components/repository";
+import { pageCsp } from "../utils/headers";
 import { handleTokens } from "../utils/tokens";
 import { getRepository } from "../utils/octokit";
 
@@ -9,6 +10,7 @@ import { getRepository } from "../utils/octokit";
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
+app.use(pageCsp);
 app.use(handleTokens);
 
 /* ENDPOINTS */
