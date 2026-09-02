@@ -12,15 +12,4 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: { include: ["hono", "octokit"] },
-  test: {
-    include: ["**/*.test.tsx"],
-    globals: true,
-    poolOptions: {
-      workers: {
-        wrangler: {
-          configPath: "./wrangler.toml",
-        },
-      },
-    },
-  },
 });

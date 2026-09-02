@@ -25,8 +25,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "typecheck": "tsc --noEmit",
     "preview": "wrangler pages dev",
-    "test": "vitest",
     "deploy": "$npm_execpath run build && wrangler pages deploy"
   },
   "dependencies": {
@@ -39,8 +39,8 @@
     "@cloudflare/workers-types": "^5.20260902.1",
     "@hono/vite-cloudflare-pages": "^0.4.3",
     "@hono/vite-dev-server": "^0.26.1",
+    "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11",
     "wrangler": "^4.128.0"
   }
 }

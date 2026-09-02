@@ -8,7 +8,8 @@ import { version } from "../../package.json";
 import { Bindings, Variables } from "..";
 
 /**
- * Asynchronously verifies the token by checking the status of fetching repositories.
+ * Asynchronously verifies a token by calling the rate-limit endpoint (which does
+ * not itself consume rate-limit budget).
  * @async @function verifyToken
  * @param {string} token The token to verify.
  * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c The Context object.
@@ -18,9 +19,9 @@ const verifyToken = async (
   token: string,
   c: Context<{ Bindings: Bindings; Variables: Variables }>
 ): Promise<boolean> => {
-  const octokit = getOctokitInstance(c, token);
   try {
-    const { status } = await getRepos(octokit, "octocat", "Hello-World");
+    const octokit = getOctokitInstance(c, token);
+    const { status } = await octokit.request("GET /rate_limit");
     return status === 200;
   } catch (_) {
     return false;
@@ -40,11 +41,12 @@ export const apiAuth = createMiddleware(
     next: Next
   ): Promise<void | Response> => {
     const { access_token } = c.var;
-    const accessToken = access_token || c.req.header("Authorization");
-    if (accessToken && (await verifyToken(accessToken, c))) {
-      await next();
+    const header = c.req.header("Authorization")?.replace(/^Bearer\s+/i, "");
+    const token = access_token || header;
+    if (!token || !(await verifyToken(token, c))) {
+      return c.text("Unauthorized", 401);
     }
-    return c.text("Unauthorized", 401);
+    await next();
   }
 );
 
@@ -68,7 +70,7 @@ export const handleOctokit = createMiddleware(
 
 /**
  * Creates and returns an instance of Octokit for GitHub API.
- * @async @function getOctokitInstance
+ * @function getOctokitInstance
  * @param {Context<{ Bindings: Bindings; Variables: Variables }>} c - The context object.
  * @param {string} [token] - Optional token for authentication.
  * @returns {Octokit} An instance of Octokit.
@@ -90,7 +92,7 @@ export const getOctokitInstance = (
 };
 
 /**
- * Asynchronously fetches repositories from a specified ID.
+ * Asynchronously fetches a page of public repositories starting from a given ID.
  * @async @function getRepositories
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} since - The ID to start fetching repositories from.
@@ -100,11 +102,7 @@ const getRepositories = async (
   octokit: Octokit,
   since: number
 ): Promise<RestEndpointMethodTypes["repos"]["listPublic"]["response"]> => {
-  try {
-    return octokit.rest.repos.listPublic({ since }); // octokit.request("GET /repositories", { since });
-  } catch (error: any) {
-    throw error;
-  }
+  return octokit.rest.repos.listPublic({ since });
 };
 
 /**
@@ -120,11 +118,7 @@ export const getRepos = async (
   owner: string,
   repo: string
 ): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]> => {
-  try {
-    return octokit.rest.repos.get({ owner, repo }); // octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
-  } catch (error: any) {
-    throw error;
-  }
+  return octokit.rest.repos.get({ owner, repo });
 };
 
 /**
@@ -138,33 +132,41 @@ export const getRepository = async (
   octokit: Octokit,
   id: number
 ): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
-  try {
-    const { data, status, url } = await getRepositories(
-      octokit,
-      Number(id) - 1
-    ); // (id - 1) because since starts from next id
-    if (status === 200) {
-      if (data.length === 0) {
-        throw new Error("Repository not found");
-      } else {
-        const repo = data[0];
-        const {
-          name,
-          owner: { login },
-        } = repo;
-        const { data: repository } = await getRepos(octokit, login, name);
-        return repository;
-      }
-    } else {
-      throw new Error(`${status} error at ${url}`);
-    }
-  } catch (error: any) {
-    throw error;
+  // (id - 1) because `since` starts from the next id
+  const { data, status, url } = await getRepositories(octokit, Number(id) - 1);
+  if (status !== 200) {
+    throw new Error(`${status} error at ${url}`);
   }
+  if (data.length === 0) {
+    throw new Error("Repository not found");
+  }
+  const {
+    name,
+    owner: { login },
+  } = data[0];
+  const { data: repository } = await getRepos(octokit, login, name);
+  return repository;
 };
 
 /**
- * Asynchronously retrieves a random repository that has no stars, is not a forked repo and is not empty.
+ * Returns a new array with the elements of `items` in random order (Fisher-Yates).
+ * @function shuffle
+ */
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+/**
+ * Asynchronously retrieves a random repository that has no stars, is not a fork and is not empty.
+ *
+ * Picks a random `since` offset, then inspects a handful of random candidates from
+ * that page (one detailed request each) instead of scanning the whole page. If a
+ * page comes back empty the ceiling is halved, so a stale `maxId` self-corrects.
  * @async @function getRandomRepository
  * @param {Octokit} octokit - The Octokit instance for GitHub API.
  * @param {number} maxId - The maximum ID to consider for repository selection.
@@ -174,35 +176,36 @@ export const getRandomRepository = async (
   octokit: Octokit,
   maxId: number
 ): Promise<RestEndpointMethodTypes["repos"]["get"]["response"]["data"]> => {
-  try {
-    const maxIterations = 10; // max iterations
-    for (let loop = 0; loop < maxIterations; loop++) {
-      const since = Math.floor(Math.random() * maxId);
-      const { data: repositories } = await getRepositories(octokit, since);
-      const originalRepositories = repositories.filter((repo) => !repo.fork);
-      for (const repo of originalRepositories) {
-        const {
-          name,
-          owner: { login },
-        } = repo;
-        try {
-          const { data: repos } = await getRepos(octokit, login, name);
-          const { id, stargazers_count, size } = repos;
-          if (stargazers_count === 0 && size > 0) {
-            return repos;
-          }
-          console.log(
-            `${login}/${name} (id: ${id}, stars: ${stargazers_count}, size: ${size})`
-          );
-        } catch (error: any) {
-          console.log(`${login}/${name} (${error})`);
+  const maxIterations = 15;
+  const candidatesPerPage = 3;
+  let ceiling = maxId;
+  for (let loop = 0; loop < maxIterations; loop++) {
+    const since = Math.floor(Math.random() * ceiling);
+    const { data: repositories } = await getRepositories(octokit, since);
+    if (repositories.length === 0) {
+      ceiling = Math.max(1, Math.floor(ceiling / 2));
+      continue;
+    }
+    const candidates = shuffle(repositories.filter((repo) => !repo.fork)).slice(
+      0,
+      candidatesPerPage
+    );
+    for (const repo of candidates) {
+      try {
+        const { data: repos } = await getRepos(
+          octokit,
+          repo.owner.login,
+          repo.name
+        );
+        if (repos.stargazers_count === 0 && repos.size > 0) {
+          return repos;
         }
+      } catch (_) {
+        /* repo went private / was renamed / deleted since listing — skip */
       }
     }
-    throw new Error(`No repository found with ${maxIterations} iterations`);
-  } catch (error: any) {
-    throw error;
   }
+  throw new Error(`No repository found after ${maxIterations} iterations`);
 };
 
 /**
@@ -233,11 +236,7 @@ export const getAuthenticatedUser = async (
 ): Promise<
   RestEndpointMethodTypes["users"]["getAuthenticated"]["response"]
 > => {
-  try {
-    return octokit.rest.users.getAuthenticated(); // octokit.request("GET /user");
-  } catch (error: any) {
-    throw error;
-  }
+  return octokit.rest.users.getAuthenticated();
 };
 
 /**
@@ -252,9 +251,20 @@ export const handleMaxId = createMiddleware(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     next: Next
   ) => {
-    const max_id = getCookie(c, "max_id", "secure");
-    const MAX_ID = 822080279; // TODO TBU
-    c.set("max_id", max_id ? JSON.parse(max_id) : { id: MAX_ID, timestamp: 0 });
+    const MAX_ID = 1_000_000_000;
+    const cookie = getCookie(c, "max_id", "secure");
+    let max_id = { id: MAX_ID, timestamp: 0 };
+    if (cookie) {
+      try {
+        const parsed = JSON.parse(cookie);
+        if (typeof parsed?.id === "number" && parsed.id > 0) {
+          max_id = { id: parsed.id, timestamp: Number(parsed.timestamp) || 0 };
+        }
+      } catch (_) {
+        /* malformed cookie — fall back to the default */
+      }
+    }
+    c.set("max_id", max_id);
     await next();
   }
 );

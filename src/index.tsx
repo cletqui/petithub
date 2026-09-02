@@ -1,5 +1,6 @@
 import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
 import { Octokit } from "octokit";
 
 import { renderer } from "./utils/renderer";
@@ -32,6 +33,12 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 /* MIDDLEWARES */
 app.use(logger());
+app.use(
+  secureHeaders({
+    xFrameOptions: "DENY",
+    referrerPolicy: "strict-origin-when-cross-origin",
+  })
+);
 app.use(renderer);
 app.use("/", handleMaxId);
 app.use("/", handleTokens);
@@ -61,5 +68,11 @@ app.get(
     return c.redirect("/", 301);
   }
 );
+
+/* ERRORS */
+app.onError((err, c) => {
+  console.error(err);
+  return c.text("Something went wrong. Try reloading.", 500);
+});
 
 export default app;

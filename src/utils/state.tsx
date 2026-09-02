@@ -45,7 +45,7 @@ export const handleState = createMiddleware(
   ): Promise<Response | void> => {
     const secret = getCookie(c, "state", "secure");
     const { state } = c.req.query();
-    if (secret === state) {
+    if (secret && state && secret === state) {
       await handleRefresh(c, next);
     } else {
       console.error(
@@ -57,10 +57,11 @@ export const handleState = createMiddleware(
 );
 
 /**
- * Generates a random string using Math.random() and Date.now().
+ * Generates a cryptographically random hex string for use as an OAuth state token.
  * @function generateRandomString
  * @returns {string} A randomly generated string.
  */
 const generateRandomString = (): string => {
-  return Math.floor(Math.random() * Date.now()).toString(36);
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 };

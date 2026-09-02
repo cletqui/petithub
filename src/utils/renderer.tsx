@@ -8,14 +8,16 @@ import { fetchRepositoryData } from "./octokit";
 import { Loader } from "../components/loader";
 import { Login } from "../components/login";
 
+type RepositoryData = RestEndpointMethodTypes["repos"]["get"]["response"]["data"];
+
 const Head = ({
   repository,
 }: {
-  repository: Promise<
-    RestEndpointMethodTypes["repos"]["get"]["response"]["data"]
-  >;
+  repository?: Promise<RepositoryData>;
 }) => {
-  const full_name = fetchRepositoryData(repository, "full_name");
+  const full_name = repository
+    ? fetchRepositoryData(repository, "full_name").catch(() => "")
+    : "";
   return (
     <head>
       <meta charset="UTF-8" />
@@ -41,11 +43,9 @@ const Header = (): JSX.Element => {
   return (
     <header class="header">
       <div class="header-brand">
-        <img
-          class="icon refresh"
-          src="/static/icons/refresh.svg"
-          onclick="window.location.reload()"
-        />
+        <a class="refresh-link" href="/" aria-label="Load another repository">
+          <img class="icon refresh" src="/static/icons/refresh.svg" alt="" />
+        </a>
         <h1 class="title">{"PetitHub"}</h1>
       </div>
       <Login octokit={octokit} />
@@ -86,9 +86,7 @@ const Footer = (): JSX.Element => {
   );
 };
 
-const Body = async ({ children }: PropsWithChildren) => {
-  const c = useRequestContext();
-  const { octokit } = c.var;
+const Body = ({ children }: PropsWithChildren) => {
   return (
     <body>
       <Header />
@@ -104,9 +102,9 @@ export const renderer = jsxRenderer(
   ({
     children,
     repository,
-  }: PropsWithChildren<{ repository?: any }>): JSX.Element => {
+  }: PropsWithChildren<{ repository?: Promise<RepositoryData> }>): JSX.Element => {
     return (
-      <html>
+      <html lang="en">
         <Head repository={repository} />
         <Body children={children} />
       </html>
