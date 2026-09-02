@@ -1,11 +1,14 @@
 import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
-import { Octokit } from "octokit";
 
 import { renderer } from "./utils/renderer";
 import { handleTokens } from "./utils/tokens";
-import { getRandomRepository, handleMaxId } from "./utils/octokit";
+import {
+  getRandomRepository,
+  handleMaxId,
+  type Octokit,
+} from "./utils/octokit";
 import { Repository } from "./components/repository";
 
 import api from "./routes/api";
