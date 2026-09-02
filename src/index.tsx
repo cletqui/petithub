@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
+import { pageCsp } from "./utils/headers";
 import { renderer } from "./utils/renderer";
 import { handleTokens } from "./utils/tokens";
 import {
@@ -29,6 +30,7 @@ export type Variables = {
   refresh_token?: string;
   state: string;
   octokit: Octokit;
+  cspNonce?: string;
 };
 
 /* APP */
@@ -43,6 +45,7 @@ app.use(
   })
 );
 app.use(renderer);
+app.use("/", pageCsp);
 app.use("/", handleMaxId);
 app.use("/", handleTokens);
 
