@@ -1,0 +1,26 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "19 4 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scan:
+    permissions:
+      contents: read
+      security-events: write
+    uses: cletqui/security-workflows/.github/workflows/scan.yml@b743139c050c179388e41a5ff38fbed769f6242d # v1.0.0
+    with:
+      product: petithub
+      osv_lockfile: bun.lock
+      codeql_language: javascript-typescript
+    secrets:
+      DOJO_TOKEN: ${{ secrets.DOJO_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
